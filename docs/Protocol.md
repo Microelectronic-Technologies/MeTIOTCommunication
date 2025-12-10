@@ -10,7 +10,7 @@ The following protocol outlines the process MeT IOT devices take when starting a
 
 0. Zeroconf packet sent out for device discovery.
 1. Library connects to devices TCP socket.
-2. Library initiates ECDH handshake (*see `ECDH Handshake` for more details).
+2. Library initiates ECDH handshake (*see `ECDH Handshake` for more details*).
 3. Library sends a identification request command.
 4. Device responds with its device type and unique identifier.
 5. Regular use begins.
@@ -21,7 +21,7 @@ The following protocol outlines the process MeT IOT devices take when starting a
 
 ## Encryption
 
-**TODO**
+This protocol uses AES-256-CBC. Each message but be encrypted with a new unique 16 byte IV that is transported with the message (*see `Protocol Format`*)
 
 ## CRC
 
@@ -33,19 +33,20 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 
 ![Packet Diagram](images/Packet.jpg)
 
+### Packet Format
+
 | Field | Description | Bytes |
 |-|-|-|
 | COBS Header | Used to identify the start of a packet. Stores information on how data after it is to be decoded | 1 |
-| CRC | 16 bit Cyclic Redundancy Check. Used for error detection in the data | 2 |
-| Data | See `Data Format` below | 1-n |
+| Encrypted Data | Data encrypted with AES-256. See `Encrypted Block Format` below. | A multiple of 16 bytes (16, 32, 48, 64, etc.) |
+| IV | The IV used during encryption. Ensures each encrypted message is unique even if data is identical. | 16 |
 | COBS Trailer | Used to identify the end of a packet. This is always 0x00 | 1 | 
 
-## Data Field Format
+### Encrypted Block Format
 
-| Field | Description | Bytes |
-|-|-|-|
-| Header | Identifies packet purpose | 1 |
-| Data | Payload as defined below (dependent on direction) | 0-n |
+| CRC | 16 bit Cyclic Redundancy Check. Used for error detection in the data | 2 |
+| Data Header | Identifies packet purpose | 1 |
+| Data | Payload as defined below (dependent on direction & Data Header) | 0-n |
 
 ### ESP32 to Library Protocol
 
@@ -53,7 +54,7 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 |-|-|-|-|
 | Malformed Packet Notification | 0xFF | | 1 |
 | Device Identifier | 0xFE | 1 byte device identifier (*see `Device Identification Codes`*) followed by 4 byte unique device identifier | 5 |
-| Data | 0xFD | Refer to `Device Data Field` | 9000 |
+| Data | 0xFD | Refer to `Device Data Field` |  |
 
 ### Library to ESP32 Protocol
 
