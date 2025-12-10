@@ -44,6 +44,8 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 
 ### Encrypted Block Format
 
+| Field | Description | Bytes |
+|-|-|-|
 | CRC | 16 bit Cyclic Redundancy Check. Used for error detection in the data | 2 |
 | Data Header | Identifies packet purpose | 1 |
 | Data | Payload as defined below (dependent on direction & Data Header) | 0-n |
@@ -53,7 +55,7 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 | Purpose | Header | Data | Bytes |
 |-|-|-|-|
 | Malformed Packet Notification | 0xFF | | 1 |
-| Device Identifier | 0xFE | 1 byte device identifier (*see `Device Identification Codes`*) followed by 4 byte unique device identifier | 5 |
+| Device Identifier | 0xFE | 1 byte device identifier (*see `Device Identification Codes`*) followed by a 4 byte unique device identifier | 5 |
 | Data | 0xFD | Refer to `Device Data Field` |  |
 
 ### Library to ESP32 Protocol
@@ -71,6 +73,10 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 
 ### Device Data Field
 
+![Device Data Field Diagram](images/DeviceData.jpg)
+
+*As stated in the diagram, this only represents the **Data Header and Data Subheader/Data** sections of the packet format (See `Packet Diagram` above)*
+
 #### Device Data Field Format
 
 | Field | Purpose |
@@ -84,6 +90,7 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 
 | Sub-Header | Data Field | Data Type |
 |-|-|-|
+| 0x00 | Data End | |
 
 > [!IMPORTANT]
 > Only the following data types are supported:
