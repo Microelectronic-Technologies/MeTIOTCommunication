@@ -5,13 +5,13 @@ void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::ve
     std::vector<uint8_t> encryptedBuffer;
     std::vector<uint8_t> ivBuffer;
     
-    // -- Calc CRC
+    // -- Calc CRC (little endian)
     uint16_t crc = calculateCRC(data);
     uint8_t highByte = (crc >> 8) & 0xFF;
     uint8_t lowByte = crc & 0xFF;
 
-    crcDataBuffer.emplace_back(highByte);
     crcDataBuffer.emplace_back(lowByte);
+    crcDataBuffer.emplace_back(highByte);
     
     // Copy in data
     crcDataBuffer.insert(crcDataBuffer.end(), data.begin(), data.end());
@@ -37,11 +37,46 @@ void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::ve
 }
 
 bool AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet, std::vector<uint8_t>& data) {
-    // Decode COBS
+    // -- Decode COBS
+    std::vector<uint8_t> encryptedAndIVMessage(packet.size());
     
-    // Decrypt
+    size_t decodedSize = cobsDecode(packet.data(), packet.size(), encryptedAndIVMessage.data());
 
-    // Check CRC
+    encryptedAndIVMessage.resize(decodedSize);
+
+    // -- Decrypt
+    // Check sizing
+    if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
+        // TODO: Handle error
+        return false;
+    }
+    const size_t blockCount = (encryptedAndIVMessage.size() - IV_SIZE) / 16;
+
+    std::vector<uint8_t> encryptedData(encryptedAndIVMessage.begin(), encryptedAndIVMessage.begin() + (blockCount * 16));
+    std::vector<uint8_t> IV(encryptedAndIVMessage.begin() + (blockCount * 16), encryptedAndIVMessage.end());
+
+    data.resize(blockCount * 16);
+
+    bool err = encryptionHandler.decryptData(encryptedData, data, IV);
+    if (!err) {
+        // TODO: Handle error
+        return false;
+    }
+
+    // -- Check CRC (little endian)
+    uint16_t crc = static_cast<uint16_t>(data[1] << 8) | data[0];
+
+    // Remove CRC from data
+    std::shift_left(data.begin(), data.end(), CRC_SIZE);
+    data.resize(data.size() - CRC_SIZE);
+
+    bool crcCheckResult = checkCRC(crc, data);
+    if (!crcCheckResult) {
+        // TODO: Handle error
+        return false;
+    }
+
+    return true;
 }
 
 void AbstractProtocol::createRejectionPacket(std::vector<uint8_t>& packet) {

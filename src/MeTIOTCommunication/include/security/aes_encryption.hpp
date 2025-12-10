@@ -3,8 +3,12 @@
 
 #include <vector>
 #include <cstdint>
+#include <random>
+#include <algorithm>
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
+
+#define IV_SIZE 16
 
 class EncryptionHandler {
     private:

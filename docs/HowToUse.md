@@ -26,10 +26,10 @@ While not supported directly in this library all MeT IoT devices supported in th
 2. Generate a packet into a buffer using a function supplied through the devices protocolHandler (These exact functions are device specific).
 3. Supply that packet to `send_packet` function.
 
-The above specifies the intended method when sending a message. Using these exact steps will automatically handle the following:
-
-* Data creation (header, data, etc).
-* Cyclic Redundancy Check creation.
-* Random IV generation.
-* AES-256 Data Encryption.
-* COBS encoding.
+> INFORMATION: This section is not important for normal use
+> Using these exact steps will automatically handle the following:
+> * Data creation (header, data, etc).
+> * Cyclic Redundancy Check creation.
+> * Random IV generation.
+> * AES-256 Data Encryption.
+> * COBS encoding.

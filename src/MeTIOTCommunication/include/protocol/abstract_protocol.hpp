@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <algorithm>
 
 #include "../utils/crc.hpp"
 #include "../utils/cobs.hpp"

@@ -2,6 +2,12 @@
 
 void EncryptionHandler::generateIV(std::vector<uint8_t>& buffer) {
     // Generate 16 byte IV
+    std::random_device rd;
+    buffer.resize(IV_SIZE);
+    
+    std::generate(buffer.begin(), buffer.end(), [&rd]() {
+        return static_cast<uint8_t>(rd());
+    });
 }
 
 EncryptionHandler::EncryptionHandler(const std::vector<uint8_t>& key) : privateKey(key) {

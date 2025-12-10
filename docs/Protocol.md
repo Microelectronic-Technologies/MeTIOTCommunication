@@ -102,3 +102,32 @@ G.D. Nguyen, “Fast CRCs,” IEEE Transactions on Computers, vol. 58, no. 10, p
 > * `float`
 > * `double`
 > * `size_t`
+
+## Purpose Of Protocol Components
+
+### COBS
+
+Consistent Overhead Byte Stuffing (COBS) provides this protocol reliable delineate (mark the start and end of) packets, ensuring the entire data stream has been received.
+
+* **Packet Delimitation:** It ensures that the specific byte used as the packet trailer (in this case `0x00`) never appears within the actual packet data (the COBS Header, Encrypted Data, and IV).
+* **Decoding Information:** The COBS Header provides essential information for the receiver on how to decode the data, specifically where the original `0x00` bytes (if any) were located before encoding.
+
+### AES-256 Encryption Blocks
+
+The purpose of using AES-256-CBC is to ensure the confidentiality and integrity of the data transmitted over the network.
+
+* **Confidentiality:** All data is scrambled so that only parties processing the correct shared key (establish via the ECDH Handshake) can decrypt and read the message content, preventing eavesdropping.
+
+### IV
+
+The Initialization Vector is a unique 16-byte code used for every message encyption to ensure that even if the same plaintext data is sent multiple tiems, the resulting ciphertext (Encrypted Data) will be different each time.
+
+* **Security:** The IV transforms even the exact same data into unique looking encrypted messaging preventing patterns from being exposed to attackers.
+* **Transport:** The IV is transported unecrypted within the Packet Format so the receiving device can use it to correctly initialize the decryption process for that specific message.
+
+### CRC
+
+Cyclic Redundancy Check is a 16-bit code that provides error detection for the message payload.
+
+* **Data Integrity Check:** The sending device calculates a small check value based on the data header and data content. The receiving device recalculates the CRC from the received Data Header and Data and compares it to the transmitted CRC value.
+* **Error Detection:** If the two values do not match, it signifies that one or more bits of either the data or CRC have been altered/corrupted during transmission (e.g., due to network noise), and the receiving device can discard the packet as unreliable.
