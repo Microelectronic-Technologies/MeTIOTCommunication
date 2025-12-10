@@ -16,29 +16,7 @@ void DeviceClient::disconnect() {
     socketCore.disconnect();
 }
 
-bool DeviceClient::send_command(uint8_t command) {
-    std::vector<uint8_t> packet;
-
-    // Call protocol/ function to craft packet
-
-    
-    // Send packet through socketCore
-    int bytesSent = socketCore.send_data(packet);
-    if (bytesSent != packet.size()) {
-        // TODO: Handle not all bytes sent
-        return false;
-    }
-
-    return true;
-}
-
-bool DeviceClient::send_command(uint8_t command, std::vector<uint8_t>& payload) {
-    std::vector<uint8_t> packet;
-
-    // Call protocol/ function to craft packet
-
-
-    // Send packet through socketCore
+bool DeviceClient::send_packet(const std::vector<uint8_t>& packet) {
     int bytesSent = socketCore.send_data(packet);
     if (bytesSent != packet.size()) {
         // TODO: Handle not all bytes sent
@@ -60,6 +38,7 @@ bool DeviceClient::perform_device_initialization() {
     // Recieve device data
 
 
+    // Assign specific protocol to protocolHandler (possible push to helper function)
 
 }
 

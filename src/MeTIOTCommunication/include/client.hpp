@@ -4,12 +4,15 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <memory> 
 
 #include "core/socket_core.hpp"
+#include "protocol/abstract_protocol.hpp"
 
 class DeviceClient {
   private:
     SocketCore socketCore;
+    std::unique_ptr<AbstractProtocol> protocolHandler;
 
     bool perform_device_initialization();
 
@@ -22,9 +25,9 @@ class DeviceClient {
 
     void disconnect();
 
-    bool send_command(uint8_t command);
+    bool send_packet(const std::vector<uint8_t>& packet);
 
-    bool send_command(uint8_t command, std::vector<uint8_t>& payload);
+    AbstractProtocol* get_protocol_handler() const { return protocolHandler.get(); }
 };
 
 #endif
