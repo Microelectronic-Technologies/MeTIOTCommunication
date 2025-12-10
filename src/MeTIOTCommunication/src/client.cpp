@@ -1,27 +1,51 @@
 #include "../include/client.hpp"
 
 bool DeviceClient::connect() {
-    int err;
+    int ret;
 
     // Connect to device
-    err = socketCore.connect();
+    ret = socketCore.connectDevice();
 
     // Complete Device initialization
-    err = perform_device_initialization();
+    ret = perform_device_initialization();
 
     return true;
 }
 
 void DeviceClient::disconnect() {
-
+    socketCore.disconnect();
 }
 
 bool DeviceClient::send_command(uint8_t command) {
+    std::vector<uint8_t> packet;
 
+    // Call protocol/ function to craft packet
+
+    
+    // Send packet through socketCore
+    int bytesSent = socketCore.send_data(packet);
+    if (bytesSent != packet.size()) {
+        // TODO: Handle not all bytes sent
+        return false;
+    }
+
+    return true;
 }
 
 bool DeviceClient::send_command(uint8_t command, std::vector<uint8_t>& payload) {
+    std::vector<uint8_t> packet;
 
+    // Call protocol/ function to craft packet
+
+
+    // Send packet through socketCore
+    int bytesSent = socketCore.send_data(packet);
+    if (bytesSent != packet.size()) {
+        // TODO: Handle not all bytes sent
+        return false;
+    }
+
+    return true;
 }
 
 bool DeviceClient::perform_device_initialization() {

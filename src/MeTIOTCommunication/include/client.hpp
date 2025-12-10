@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "socket_core.hpp"
+#include "core/socket_core.hpp"
 
 class DeviceClient {
   private:
@@ -17,7 +17,6 @@ class DeviceClient {
 
   public:
     DeviceClient(const std::string& ip, int port) : socketCore(ip, port) {}
-    ~DeviceClient();
 
     bool connect();
 
