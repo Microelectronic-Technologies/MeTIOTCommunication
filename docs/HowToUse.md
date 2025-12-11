@@ -26,7 +26,7 @@ While not supported directly in this library all MeT IoT devices supported in th
 2. Generate a packet into a buffer using a function supplied through the devices protocolHandler (These exact functions are device specific).
 3. Supply that packet to `send_packet` function.
 
-> [!INFORMATION]
+> [!NOTE]
 > This section is not important for normal use.
 >
 > Using these exact steps will automatically handle the following:
