@@ -20,11 +20,11 @@ cd build
 2. Compile library using CMake
 ```bash
 cmake ..
-cmake --build .. --config Release
+cmake --build . --config Release
 ```
 3. Export path to python
 ```bash
-export PYTHONPATH=../src/python_bindings:$PYTHONPATH
+export PYTHONPATH=./src/python_bindings:$PYTHONPATH
 ```
 4. Now you can use the library. If you first want to test it you can try
 ```bash
