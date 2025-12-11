@@ -4,8 +4,29 @@
 #include <vector>
 #include <cstdint>
 
+/* @brief    Encodes the data using COBS
+ *
+ * @param    data      Data that is being encoded
+ * @param    length    Size of the data being encoded
+ * @param    buffer    Buffer to store the encoded data (ensure adequate buffer size)
+ * 
+ * @retval   `size_t` - The real output size of the encoding
+ * 
+ * @note     This is a c-style function. Its implementation requires the use of raw pointers.
+ * @note     This cobs encoding function does NOT add the deliminator.
+ */
 size_t cobsEncode (const void *data, size_t length, uint8_t *buffer);
 
+/* @brief    Decodes the data using COBS
+ *
+ * @param    buffer     The encoded data buffer
+ * @param    length     Size of the encoded COBS buffer
+ * @param    data       Data output after decoding
+ * 
+ * @retval   `size_t` - The real output size of the encoding
+ * 
+ * @note     This is a c-style function. Its implementation requires the use of raw pointers.
+ */
 size_t cobsDecode(const uint8_t *buffer, size_t length, void *data);
 
 #endif

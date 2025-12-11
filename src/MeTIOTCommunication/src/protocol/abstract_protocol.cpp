@@ -1,5 +1,8 @@
 #include "../../include/protocol/abstract_protocol.hpp"
 
+// Fix for python implementation
+AbstractProtocol::~AbstractProtocol() = default;
+
 void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::vector<uint8_t>& packet) {
     std::vector<uint8_t> crcDataBuffer;
     std::vector<uint8_t> encryptedBuffer;

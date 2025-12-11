@@ -27,6 +27,6 @@ void EncryptionHandler::encryptData(const std::vector<uint8_t>& data, std::vecto
 
 }
 
-bool EncryptionHandler::decryptData(const std::vector<uint8_t>& encryptedData, std::vector<uint8_t>& data, std::vector<uint8_t>& IV) {
+bool EncryptionHandler::decryptData(const std::vector<uint8_t>& encryptedData, std::vector<uint8_t>& data, const std::vector<uint8_t>& IV) {
     // Decrypt encryptedData into data
 }

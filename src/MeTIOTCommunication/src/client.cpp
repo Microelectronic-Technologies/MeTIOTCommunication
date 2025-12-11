@@ -1,13 +1,12 @@
 #include "../include/client.hpp"
 
 bool DeviceClient::connect() {
-    int ret;
 
     // Connect to device
-    ret = socketCore.connectDevice();
+    int ret = socketCore.connectDevice();
 
     // Complete Device initialization
-    ret = perform_device_initialization();
+    bool success = perform_device_initialization();
 
     return true;
 }
@@ -39,7 +38,7 @@ bool DeviceClient::perform_device_initialization() {
 
 
     // Assign specific protocol to protocolHandler (possible push to helper function)
-
+    return true;
 }
 
 bool DeviceClient::perform_ecdh() {
