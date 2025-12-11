@@ -27,7 +27,7 @@ While not supported directly in this library all MeT IoT devices supported in th
 3. Supply that packet to `send_packet` function.
 
 > [!NOTE]
-> This section is not important for normal use.
+> This section below (describing what is happening) is not important for normal use and mostly intended for understanding what the library is doing behind the scenes.
 >
 > Using these exact steps will automatically handle the following:
 > * Data creation (header, data, etc).
