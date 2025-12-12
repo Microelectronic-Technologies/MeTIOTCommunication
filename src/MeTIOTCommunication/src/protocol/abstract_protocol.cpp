@@ -39,7 +39,9 @@ void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::ve
     packet.resize(encodedSize);
 }
 
-bool AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet, std::vector<uint8_t>& data) {
+std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet) {
+    std::vector<uint8_t> data;
+
     // -- Decode COBS
     std::vector<uint8_t> encryptedAndIVMessage(packet.size());
     
@@ -51,7 +53,7 @@ bool AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet, std
     // Check sizing
     if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
         // TODO: Handle error
-        return false;
+        return {false, {}};
     }
     const size_t blockCount = (encryptedAndIVMessage.size() - IV_SIZE) / 16;
 
@@ -60,11 +62,7 @@ bool AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet, std
 
     data.resize(blockCount * 16);
 
-    bool err = encryptionHandler.decryptData(encryptedData, data, IV);
-    if (!err) {
-        // TODO: Handle error
-        return false;
-    }
+    encryptionHandler.decryptData(encryptedData, data, IV);
 
     // -- Check CRC (little endian)
     uint16_t crc = static_cast<uint16_t>(data[1] << 8) | data[0];
@@ -76,12 +74,19 @@ bool AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet, std
     bool crcCheckResult = checkCRC(crc, data);
     if (!crcCheckResult) {
         // TODO: Handle error
-        return false;
+        return {false, {}};
     }
 
-    return true;
+    return {true, data};
 }
 
-void AbstractProtocol::createRejectionPacket(std::vector<uint8_t>& packet) {
+std::vector<uint8_t> AbstractProtocol::createRejectionPacket() {
+    std::vector<uint8_t> buffer;
+    
+    std::vector<uint8_t> data = {
+        static_cast<uint8_t>(Protocol::OutgoingHeader::MalformedPacketNotification)
+    };
+    constructPacket(data, buffer);
 
+    return buffer;
 }

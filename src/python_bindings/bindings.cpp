@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h> // Required for std::vector, std::string conversion
+#include <pybind11/stl.h> 
 
 #include "client.hpp"
 #include "protocol/abstract_protocol.hpp"
@@ -9,39 +9,42 @@ namespace py = pybind11;
 
 using KeyVector = std::vector<uint8_t>;
 
+// Forward declaration of the C++ function that handles the dynamic cast
+py::object cast_protocol_handler(DeviceClient& client);
+
 PYBIND11_MODULE(MeTIOT, m) {
      m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
+
+     py::enum_<DeviceType>(m, "DeviceType")
+        .value("UNKNOWN", DeviceType::UNKNOWN)
+        .value("FISH_TANK", DeviceType::FISH_TANK)
+        .export_values();
 
      // --- Protocols ---
 
      // Expose the Abstract Base Class
      py::class_<AbstractProtocol>(m, "AbstractProtocol")
-          // NOTE: The C++ constructor is: AbstractProtocol(std::vector<uint8_t>& key)
-          // This is ONLY called by derived classes in C++, so we skip exposing it here.
-        
-          .def("deconstruct_packet", &AbstractProtocol::deconstructPacket, 
-               py::arg("packet"), py::arg("data"), 
-               "Decodes and validates a packet, storing the payload in 'data'.")
-        
+          // Base class methods
+          .def("deconstruct_packet", 
+               (std::pair<bool, std::vector<uint8_t>> (AbstractProtocol::*)(const std::vector<uint8_t>&))
+               &AbstractProtocol::deconstructPacket, 
+               py::arg("packet"), 
+               "Decodes and validates a packet, returning a tuple (status, data).")
           .def("create_rejection_packet", &AbstractProtocol::createRejectionPacket,
-               py::arg("packet"),
                "Creates a rejection packet in case of an invalid message.")
           ;
 
-     // Expose a Concrete Derived Class
+     // Expose a Concrete Derived Class (FishTankProtocol)
      py::class_<FishTankProtocol, AbstractProtocol>(m, "FishTankProtocol")
-          // Constructor: FishTankProtocol(std::vector<uint8_t>& key)
-          // Python users must pass a bytes-like object (e.g., bytes([1, 2, 3...])) 
-          // which pybind11 converts to std::vector<uint8_t>.
+          // Constructor
           .def(py::init<KeyVector&>(), py::arg("key"),
                "Initializes the protocol handler with a symmetric encryption key.")
           ;
     
-
      // --- DeviceClient ---
 
      py::class_<DeviceClient>(m, "DeviceClient")
-          // Constructor: takes IP (string) and Port (int)
+          // Constructor
           .def(py::init<const std::string&, int>(),
                py::arg("ip"), py::arg("port"),
                "Initializes the device client with IP and port.")
@@ -53,12 +56,45 @@ PYBIND11_MODULE(MeTIOT, m) {
                py::arg("packet"), 
                "Sends a raw data packet (bytes) to the device.")
 
-          // Exposing the Protocol Handler pointer
+          // ** FIX 1: Bind the getter needed by the cast_protocol_handler function **
           .def("get_protocol_handler", &DeviceClient::get_protocol_handler, 
-             // This policy is CRITICAL. It tells Pybind11:
-             // 1. Don't try to delete the returned object (it's owned by unique_ptr in DeviceClient).
-             // 2. Keep the DeviceClient instance alive as long as the returned protocol object is referenced in Python.
-             py::return_value_policy::reference_internal, 
-             "Returns the active protocol handler object.")
-          ;
+               py::return_value_policy::reference_internal,
+               "Internal method to retrieve the raw AbstractProtocol pointer.")
+
+          .def("get_device_type", &DeviceClient::get_device_type, "Returns the identified device type.")
+
+          // 2. The CRITICAL Binding Point - This calls the casting function
+          .def("get_specific_protocol_handler", 
+             [](DeviceClient& client) { return cast_protocol_handler(client); },
+             py::return_value_policy::reference_internal,
+             "Returns the protocol handler cast to its specific derived type (e.g., FishTankProtocol).")
+        ;
+}
+
+// *** Implementation of the Casting Helper Function (No changes needed here) ***
+
+py::object cast_protocol_handler(DeviceClient& client) {
+    AbstractProtocol* base_ptr = client.get_protocol_handler();
+    if (!base_ptr) {
+        throw std::runtime_error("Protocol handler is not initialized.");
+    }
+    
+    DeviceType type = client.get_device_type();
+    
+    // Check the device type and perform the safe dynamic_cast
+    if (type == DeviceType::FISH_TANK) {
+        // dynamic_cast is safe because the C++ logic ensures the underlying object is a FishTankProtocol
+        FishTankProtocol* derived_ptr = dynamic_cast<FishTankProtocol*>(base_ptr);
+        
+        if (derived_ptr == nullptr) {
+            // This case indicates a logic error in the C++ code (e.g., mismatch between deviceType and actual object)
+            throw std::runtime_error("Internal error: Handler type mismatch. Expected FishTankProtocol.");
+        }
+        
+        // py::cast uses the C++ type information to expose the correct Python class
+        return py::cast(derived_ptr, py::return_value_policy::reference_internal);
+    }
+    
+    // Default case: return the base class pointer, only exposing base methods.
+    return py::cast(base_ptr, py::return_value_policy::reference_internal);
 }

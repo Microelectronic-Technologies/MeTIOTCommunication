@@ -5,7 +5,9 @@
 #include <vector>
 #include <cstdint>
 #include <algorithm>
+#include <utility>
 
+#include "protocol_constants.hpp"
 #include "../utils/crc.hpp"
 #include "../utils/cobs.hpp"
 #include "../security/aes_encryption.hpp"
@@ -18,9 +20,9 @@ class AbstractProtocol {
         void constructPacket(const std::vector<uint8_t>& data, std::vector<uint8_t>& packet);
 
     public:
-        bool deconstructPacket(const std::vector<uint8_t>& packet, std::vector<uint8_t>& data);
+        std::pair<bool, std::vector<uint8_t>> deconstructPacket(const std::vector<uint8_t>& packet);
 
-        void createRejectionPacket(std::vector<uint8_t>& packet);
+        std::vector<uint8_t> createRejectionPacket();
 
         AbstractProtocol(std::vector<uint8_t>& key) : encryptionHandler(key) {}
         virtual ~AbstractProtocol() = 0;

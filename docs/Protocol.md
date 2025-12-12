@@ -1,5 +1,8 @@
 # TCP Communication Protocol Specifications
 
+> [!NOTE]
+> All information within this page is **NOT** required to be read or understood to use the library. If all you intend to do is use the python library please refer to [How To Use](HowToUse.md) documentation.
+
 ## Where is this protocol used?
 
 This protocol is used for all TCP communication between MeT IOT devices and external devices (standalone library, Home Assistant, etc.)
@@ -17,7 +20,19 @@ The following protocol outlines the process MeT IOT devices take when starting a
 
 ## ECDH Handshake
 
-**TODO**
+![ECDH Packet Diagram](images/ECDHPacket.jpg)
+
+### Curve Used
+
+**WIP**
+
+### ECDH Steps
+
+1. Generate Private Key
+2. Generate Public Key
+3. Send Public key to device
+4. Receive Public key from device
+5. Calculate shared key
 
 ## Encryption
 
