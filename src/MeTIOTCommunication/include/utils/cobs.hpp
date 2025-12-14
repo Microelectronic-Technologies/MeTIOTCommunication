@@ -15,7 +15,7 @@
  * @note     This is a c-style function. Its implementation requires the use of raw pointers.
  * @note     This cobs encoding function does NOT add the deliminator.
  */
-size_t cobsEncode (const void *data, size_t length, uint8_t *buffer);
+std::vector<uint8_t> cobsEncode(const std::vector<uint8_t>& data);
 
 /* @brief    Decodes the data using COBS
  *
@@ -27,6 +27,6 @@ size_t cobsEncode (const void *data, size_t length, uint8_t *buffer);
  * 
  * @note     This is a c-style function. Its implementation requires the use of raw pointers.
  */
-size_t cobsDecode(const uint8_t *buffer, size_t length, void *data);
+std::vector<uint8_t> cobsDecode(const std::vector<uint8_t>& buffer);
 
 #endif

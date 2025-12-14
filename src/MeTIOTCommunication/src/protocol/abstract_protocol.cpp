@@ -3,7 +3,7 @@
 // Fix for python implementation
 AbstractProtocol::~AbstractProtocol() = default;
 
-void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::vector<uint8_t>& packet) {
+std::vector<uint8_t> AbstractProtocol::constructPacket(const std::vector<uint8_t>& data) {
     std::vector<uint8_t> crcDataBuffer;
     std::vector<uint8_t> encryptedBuffer;
     std::vector<uint8_t> ivBuffer;
@@ -26,29 +26,18 @@ void AbstractProtocol::constructPacket(const std::vector<uint8_t>& data, std::ve
     encryptedBuffer.insert(encryptedBuffer.end(), ivBuffer.begin(), ivBuffer.end());
 
     // -- Encode in COBS
-    // Allocate size in packet
-    const size_t maxEncodedSize = encryptedBuffer.size() + (encryptedBuffer.size() / 254) + 2;
-
-    packet.clear();
-    packet.resize(maxEncodedSize);
-
-    // Encode
-    size_t encodedSize = cobsEncode(encryptedBuffer.data(), encryptedBuffer.size(), packet.data());
+    std::vector<uint8_t> packet = cobsEncode(encryptedBuffer);
 
     // Resize to actual encoded size
-    packet.resize(encodedSize);
+    return packet;
 }
 
 std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet) {
     std::vector<uint8_t> data;
 
     // -- Decode COBS
-    std::vector<uint8_t> encryptedAndIVMessage(packet.size());
+    std::vector<uint8_t> encryptedAndIVMessage = cobsDecode(packet);
     
-    size_t decodedSize = cobsDecode(packet.data(), packet.size(), encryptedAndIVMessage.data());
-
-    encryptedAndIVMessage.resize(decodedSize);
-
     // -- Decrypt
     // Check sizing
     if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
@@ -81,12 +70,9 @@ std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const 
 }
 
 std::vector<uint8_t> AbstractProtocol::createRejectionPacket() {
-    std::vector<uint8_t> buffer;
-    
     std::vector<uint8_t> data = {
         static_cast<uint8_t>(Protocol::OutgoingHeader::MalformedPacketNotification)
     };
-    constructPacket(data, buffer);
 
-    return buffer;
+    return constructPacket(data);
 }

@@ -19,6 +19,8 @@ class ECDHManager {
 
         void handleOpenSSLError(const char* func) const;
 
+        std::vector<uint8_t> generateECDHPacket();
+
     public:
         std::vector<uint8_t> publicKey;
 

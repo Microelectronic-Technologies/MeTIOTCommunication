@@ -1,53 +1,76 @@
 #include "../../include/utils/cobs.hpp"
 
-size_t cobsEncode (const void *data, size_t length, uint8_t *buffer) {
-  if (!buffer || !data) {
-    // TODO: Handle invalid pointers
-    return 0;
+std::vector<uint8_t> cobsEncode(const std::vector<uint8_t>& data) {
+  if (data.empty()) {
+    return {1};
   }
 
-  uint8_t *encode = buffer;
-  uint8_t *codep = encode++;
+  std::vector<uint8_t> encodedBuffer;
+  encodedBuffer.reserve(data.size() + (data.size() / 254) + 1);
+
+  encodedBuffer.push_back(0);
+  size_t codepIndex = 0;
   uint8_t code = 1;
 
-  for (const uint8_t *byte = (const uint8_t *)data; length--; ++byte) {
-    if (*byte)
-      *encode++ = *byte, ++code;
+  for (const uint8_t byte : data) {
+    if (byte != 0) {
+      encodedBuffer.push_back(byte);
+      ++code;
+    }
 
-    if (!*byte || code == 0xff) {
-      *codep = code, code = 1, codep = encode;
-      if (!*byte || length)
-        ++encode;
+    if (byte == 0 || byte == 0xFF) {
+      encodedBuffer[codepIndex] = code;
+
+      code = 1;
+
+      codepIndex = encodedBuffer.size();
+
+      encodedBuffer.push_back(0);
     }
   }
-  *codep = code;
 
-  return (size_t)(encode - buffer);
+  encodedBuffer[codepIndex] = code;
+
+  encodedBuffer.push_back(0x00); // Delim
+
+  return encodedBuffer;
 }
 
-size_t cobsDecode(const uint8_t *buffer, size_t length, void *data) {
-  if (!buffer || !data) {
-    // TODO: Handle invalid pointers
-    return 0;
-  }
+std::vector<uint8_t> cobsDecode(const std::vector<uint8_t>& buffer) {
+    if (buffer.empty()) {
+        return {}; // Empty input always results in empty output
+    }
+    
+    std::vector<uint8_t> decoded_data;
+    decoded_data.reserve(buffer.size());
 
-  const uint8_t *byte = buffer;
-  uint8_t *decode = (uint8_t *)data;
+    size_t buffer_index = 0;
+    
+    while (buffer_index < buffer.size()) {
+        uint8_t code = buffer[buffer_index++];
+        
+        if (code == 0) {
+            // TODO: Handle error
+        }
+        
+        uint8_t block_size = code - 1;
 
-  for (uint8_t code = 0xff, block = 0; byte < buffer + length; --block)
-  {
-    if (block)
-      *decode++ = *byte++;
-    else
-    {
-      block = *byte++;
-      if (block && (code != 0xff))
-        *decode++ = 0;
-      code = block;
-      if (!code)
-        break;
+    if (buffer_index + block_size > buffer.size()) {
+      // TODO: Handle error
+    }
+
+    std::copy(
+      buffer.begin() + buffer_index,
+      buffer.begin() + buffer_index + block_size,
+      std::back_inserter(decoded_data)
+    );
+
+    buffer_index += block_size;
+        
+    if (code != 0xFF && buffer_index < buffer.size()) {
+      decoded_data.push_back(0);
     }
   }
 
-  return (size_t)(decode - (uint8_t *)data);
+  return decoded_data;
 }

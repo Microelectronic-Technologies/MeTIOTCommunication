@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <algorithm>
 #include <utility>
+#include <iostream>
 
 #include "protocol_constants.hpp"
 #include "../utils/crc.hpp"
@@ -17,7 +18,7 @@ class AbstractProtocol {
         EncryptionHandler encryptionHandler;
         
     protected:
-        void constructPacket(const std::vector<uint8_t>& data, std::vector<uint8_t>& packet);
+        std::vector<uint8_t> constructPacket(const std::vector<uint8_t>& data);
 
     public:
         std::pair<bool, std::vector<uint8_t>> deconstructPacket(const std::vector<uint8_t>& packet);
