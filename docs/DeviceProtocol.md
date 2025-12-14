@@ -1,6 +1,6 @@
 # Device Protocol
 
-For information on specific commands you can use for each device refer to headers directly below. To see how to program new device protocols or information on how device protocols are handled refer to `Creating New Device Protocols` and `Current Device Protocol Implementation` at the bottom of this page.
+For information on specific commands you can use for each device refer to headers directly below. To see how to program new (not yet supported) device protocols or information on how device protocols are handled refer to `Creating New Device Protocols` and `Current Device Protocol Implementation` at the bottom of this page.
 
 ## Fish Tank Protocol
 
