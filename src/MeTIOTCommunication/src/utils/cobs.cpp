@@ -18,7 +18,7 @@ std::vector<uint8_t> cobsEncode(const std::vector<uint8_t>& data) {
       ++code;
     }
 
-    if (byte == 0 || byte == 0xFF) {
+    if (byte == 0 || code == 0xFF) {
       encodedBuffer[codepIndex] = code;
 
       code = 1;
