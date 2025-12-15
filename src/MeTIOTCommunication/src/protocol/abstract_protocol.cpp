@@ -37,23 +37,49 @@ std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const 
 
     // -- Decode COBS
     std::vector<uint8_t> encryptedAndIVMessage = cobsDecode(packet);
-    
+
     // -- Decrypt
     // Check sizing
-    if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
-        // TODO: Handle error
-        return {false, {}};
+    if (encryptedAndIVMessage.size() < (16 + IV_SIZE)) {
+        // TODO: Handle error (Packet is too small for one encrypted block and IV)
+        return {false, {0}};
     }
-    const size_t blockCount = (encryptedAndIVMessage.size() - IV_SIZE) / 16;
 
-    std::vector<uint8_t> encryptedData(encryptedAndIVMessage.begin(), encryptedAndIVMessage.begin() + (blockCount * 16));
-    std::vector<uint8_t> IV(encryptedAndIVMessage.begin() + (blockCount * 16), encryptedAndIVMessage.end());
+    if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
+        // TODO: Handle error (Encrypted data size is not a multiple of 16 bytes)
+        return {false, {1}};
+    }
 
-    data.resize(blockCount * 16);
+    const size_t encryptedDataSize = encryptedAndIVMessage.size() - IV_SIZE;
+
+    // Get data
+    std::vector<uint8_t> encryptedData(encryptedAndIVMessage.begin(), encryptedAndIVMessage.begin() + encryptedDataSize);
+    
+    // Get IV
+    std::vector<uint8_t> IV;
+    IV.reserve(IV_SIZE);
+
+    auto iv_start = encryptedAndIVMessage.begin() + encryptedDataSize;
+
+    IV.insert(IV.end(), iv_start, encryptedAndIVMessage.end());
+
+    // Debug check IV
+    std::cout << "IV Extracted: ";
+    for (uint8_t byte : IV) {
+        std::cout << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::endl;
+
+    data.resize(encryptedDataSize);
 
     encryptionHandler.decryptData(encryptedData, data, IV);
 
     // -- Check CRC (little endian)
+    if (data.size() < CRC_SIZE) {
+        // TODO: Handle error (Decrypted data is smaller than CRC size)
+        return {false, {2}};
+    }
+
     uint16_t crc = static_cast<uint16_t>(data[1] << 8) | data[0];
 
     // Remove CRC from data
@@ -63,7 +89,7 @@ std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const 
     bool crcCheckResult = checkCRC(crc, data);
     if (!crcCheckResult) {
         // TODO: Handle error
-        return {false, {}};
+        return {false, {3}};
     }
 
     return {true, data};

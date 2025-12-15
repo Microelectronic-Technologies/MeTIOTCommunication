@@ -40,23 +40,33 @@ std::vector<uint8_t> cobsDecode(const std::vector<uint8_t>& buffer) {
     if (buffer.empty()) {
         return {}; // Empty input always results in empty output
     }
+
+    if (buffer.back() != 0x00 || buffer.size() == 1) {
+      // TODO: Handle error (no delim)
+      std::cout << "Buffer doesn't end in 0x00" << std::endl;
+      return {};
+    }
     
     std::vector<uint8_t> decoded_data;
-    decoded_data.reserve(buffer.size());
+    decoded_data.reserve(buffer.size() - 1);
 
     size_t buffer_index = 0;
     
-    while (buffer_index < buffer.size()) {
-        uint8_t code = buffer[buffer_index++];
+    while (buffer_index < buffer.size() - 1) {
+      uint8_t code = buffer[buffer_index++];
         
-        if (code == 0) {
-            // TODO: Handle error
-        }
+      if (code == 0) {
+        // TODO: Handle error (Delim early)
+        std::cout << "Found delim early" << std::endl;
+        return {};
+      }
         
-        uint8_t block_size = code - 1;
+      uint8_t block_size = code - 1;
 
-    if (buffer_index + block_size > buffer.size()) {
+    if (buffer_index + block_size > buffer.size() - 1) {
       // TODO: Handle error
+      std::cout << "Block size would overrun the buff before delim" << std::endl;
+      return {};
     }
 
     std::copy(
@@ -67,8 +77,10 @@ std::vector<uint8_t> cobsDecode(const std::vector<uint8_t>& buffer) {
 
     buffer_index += block_size;
         
-    if (code != 0xFF && buffer_index < buffer.size()) {
-      decoded_data.push_back(0);
+    if (code != 0xFF) {
+      if (buffer_index < buffer.size() - 1) { 
+        decoded_data.push_back(0);
+      }
     }
   }
 

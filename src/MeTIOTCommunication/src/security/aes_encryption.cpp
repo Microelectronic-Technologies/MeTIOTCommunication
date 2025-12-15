@@ -24,12 +24,14 @@ void EncryptionHandler::encryptData(std::vector<uint8_t>& data, std::vector<uint
     
     if (!(ctx = EVP_CIPHER_CTX_new())) {
         // TODO: Handle error
+        std::cout << "ctx fail" << std::endl;
         return;
     }
 
     // Init encryption operation
     if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, privateKey.data(), ivBuffer.data())) {
         // TODO: Handle error
+        std::cout << "Init fail" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         return;
     }
@@ -45,6 +47,7 @@ void EncryptionHandler::encryptData(std::vector<uint8_t>& data, std::vector<uint
     // Provide message being encrypted
     if (1 != EVP_EncryptUpdate(ctx, encryptedData.data(), &updateLen, data.data(), dataLen)) {
         // TODO: Handle error
+        std::cout << "Update fail" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         encryptedData.clear();
         return;
@@ -55,6 +58,7 @@ void EncryptionHandler::encryptData(std::vector<uint8_t>& data, std::vector<uint
     // Finalize the encryption
     if (1 != EVP_EncryptFinal_ex(ctx, encryptedData.data() + totalEncryptedLen, &finalLen)) {
         // TODO: Handle error
+        std::cout << "Final fail" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         encryptedData.clear();
         return; 
@@ -73,11 +77,13 @@ void EncryptionHandler::decryptData(const std::vector<uint8_t>& encryptedData, s
 
     if (!(ctx = EVP_CIPHER_CTX_new())) {
         // TODO: Handle error
+        std::cout << "ctx fail" << std::endl;
         return;
     }
 
     if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, privateKey.data(), IV.data())) {
         // TODO: Handle error
+        std::cout << "DecryptInit fail" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         return;
     }
@@ -91,6 +97,7 @@ void EncryptionHandler::decryptData(const std::vector<uint8_t>& encryptedData, s
 
     if (1 != EVP_DecryptUpdate(ctx, data.data(), &updateLen, encryptedData.data(), encryptedLen)) {
         // TODO: Handle error (Bad key/IV)
+        std::cout << "Bad key/IV" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         data.clear();
         return;
@@ -100,6 +107,7 @@ void EncryptionHandler::decryptData(const std::vector<uint8_t>& encryptedData, s
 
     if (1 != EVP_DecryptFinal_ex(ctx, data.data() + totalDecryptedLen, &finalLen)) {
         // TODO: Handle error (Auth/Padding error)
+        std::cout << "Auth/Padding error" << std::endl;
         EVP_CIPHER_CTX_free(ctx);
         data.clear();
         return;

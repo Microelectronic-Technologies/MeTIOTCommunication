@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <random>
 #include <algorithm>
+#include <iostream>
 #include <openssl/evp.h>
 #include <openssl/crypto.h>
 
