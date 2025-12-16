@@ -20,7 +20,7 @@ std::vector<uint8_t> AbstractProtocol::constructPacket(const std::vector<uint8_t
     crcDataBuffer.insert(crcDataBuffer.end(), data.begin(), data.end());
 
     // -- Encrypt
-    encryptionHandler.encryptData(crcDataBuffer, encryptedBuffer, ivBuffer);
+    encryptionHandler->encryptData(crcDataBuffer, encryptedBuffer, ivBuffer);
 
     // Combine Encrypted data and IV
     encryptedBuffer.insert(encryptedBuffer.end(), ivBuffer.begin(), ivBuffer.end());
@@ -62,17 +62,10 @@ std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const 
     auto iv_start = encryptedAndIVMessage.begin() + encryptedDataSize;
 
     IV.insert(IV.end(), iv_start, encryptedAndIVMessage.end());
-
-    // Debug check IV
-    std::cout << "IV Extracted: ";
-    for (uint8_t byte : IV) {
-        std::cout << static_cast<int>(byte) << " ";
-    }
-    std::cout << std::endl;
-
+    
     data.resize(encryptedDataSize);
 
-    encryptionHandler.decryptData(encryptedData, data, IV);
+    encryptionHandler->decryptData(encryptedData, data, IV);
 
     // -- Check CRC (little endian)
     if (data.size() < CRC_SIZE) {

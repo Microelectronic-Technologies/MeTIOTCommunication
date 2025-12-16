@@ -21,10 +21,9 @@ class DeviceClient {
     SocketCore socketCore;
     std::unique_ptr<AbstractProtocol> protocolHandler;
     DeviceType deviceType;
+    std::uint8_t
 
     bool perform_device_initialization();
-
-    bool perform_ecdh(std::vector<uint8_t>& key);
 
     bool assign_device_protocol(uint8_t deviceID, std::vector<uint8_t>& key);
 

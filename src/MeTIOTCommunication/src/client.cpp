@@ -44,16 +44,11 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID, std::vector<uint8_t>
 
 bool DeviceClient::perform_device_initialization() {
     bool success;
-    
-    // -- Perform ECDH
-    std::vector<uint8_t> key;
-    success = perform_ecdh(key);
-    std::cout << "perform_ecdh ret: " << (success ? "True" : "False") << std::endl;
 
     // -- Send device identification request
     // Create DeviceAgnosticProtocol
     std::cout << "Creating DeviceAgnosticProtocol\n";
-    DeviceAgnosticProtocol deviceAgnosticProtocol(key);
+    DeviceAgnosticProtocol deviceAgnosticProtocol();
 
     std::cout << "Creating id req packet\n";
     std::vector<uint8_t> packet = deviceAgnosticProtocol.create_device_id_request();
@@ -68,29 +63,14 @@ bool DeviceClient::perform_device_initialization() {
     }
 
     // -- Recieve device data
-
-
+    
 
     // -- Assign specific protocol to protocolHandler (possible push to helper function)
     uint8_t deviceID = 0xFF;
-    success = assign_device_protocol(deviceID, key);
+    success = assign_device_protocol(deviceID);
     if (!success) {
         std::cout << "No success";
     }
-    
-    return true;
-}
-
-bool DeviceClient::perform_ecdh(std::vector<uint8_t>& key) {
-    // TODO: Implement
-    key.resize(32);
-
-    std::cout << "perform_ecdh test... Key value: ";
-    for (int i = 0; i < 32; i++) {
-        key[i] = i;
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
     
     return true;
 }

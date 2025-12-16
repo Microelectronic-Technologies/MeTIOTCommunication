@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <utility>
 #include <iostream>
+#include <memory>
+#include <string>
 
 #include "protocol_constants.hpp"
 #include "../utils/crc.hpp"
@@ -15,8 +17,10 @@
 
 class AbstractProtocol {
     private:
-        EncryptionHandler encryptionHandler;
-        
+        std::unique_ptr<EncryptionHandler> encryptionHandler = nullptr;
+        uint64_t deviceID;
+        uint32_t sessionSalt;
+
     protected:
         std::vector<uint8_t> constructPacket(const std::vector<uint8_t>& data);
 
@@ -25,7 +29,9 @@ class AbstractProtocol {
 
         std::vector<uint8_t> createRejectionPacket();
 
-        AbstractProtocol(std::vector<uint8_t>& key) : encryptionHandler(key) {}
+        void createEncryptionHandler(std::string passPhrase);
+
+        AbstractProtocol(uint64_t deviceID, uint32_t sessionSalt) : deviceID(deviceID), sessionSalt(sessionSalt) {}
         virtual ~AbstractProtocol() = 0;
 };
 
