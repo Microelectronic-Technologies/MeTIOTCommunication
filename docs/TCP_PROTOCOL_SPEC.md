@@ -111,7 +111,7 @@ The Data Payload consists of one or more data points, each preceded by its own S
 > * `int32_t`
 > * `int64_t`
 > 
-> *All of the above unsigned variants are additionally allowed*
+> *All unsigned variants of the above data types are allowed*
 >
 > The following data types *can* be used but research must first be conducted to ensure each devices architecture support the same byte length.
 >
@@ -120,7 +120,7 @@ The Data Payload consists of one or more data points, each preceded by its own S
 
 ## Device-Specific Protocol: Fish Tank
 
-This section details the custom commands and data formats specific to the Fish Tank device (`Device ID: 0xFF`).
+This section details the custom commands and data formats specific to the Fish Tank device (`Device ID: 0xFF`). The Fish Tank protocol still inherits all commands defined in [Data Header Commands and Flow](#data-header-commands-and-flow).
 
 ### Fish Tank: Library-to-Device Commands
 
