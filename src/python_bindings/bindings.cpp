@@ -26,7 +26,7 @@ py::object protocol_value_to_py_object(const ProtocolValue& value) {
 
 std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, const std::vector<uint8_t>& data) {
      // Call pure cpp function
-     std::map<std::string, ProtocolValue> cppMap = self.interpretData(data);
+     std::map<std::string, ProtocolValue> cppMap = self.interpret_data(data);
 
      // Translate pure cpp into python map
      std::map<std::string, py::object> pythonMap;
@@ -52,10 +52,10 @@ PYBIND11_MODULE(MeTIOT, m) {
           // Base class methods
           .def("deconstruct_packet", 
                (std::pair<uint8_t, std::vector<uint8_t>> (AbstractProtocol::*)(const std::vector<uint8_t>&))
-               &AbstractProtocol::deconstructPacket, 
+               &AbstractProtocol::deconstruct_packet, 
                py::arg("packet"), 
                "Decodes and validates a packet, returning a tuple (status, data).")
-          .def("create_rejection_packet", &AbstractProtocol::createRejectionPacket,
+          .def("create_rejection_packet", &AbstractProtocol::create_rejection_packet,
                "Creates a rejection packet in case of an invalid message.")
           .def("interpret_data", 
                &wrap_interpret_data,

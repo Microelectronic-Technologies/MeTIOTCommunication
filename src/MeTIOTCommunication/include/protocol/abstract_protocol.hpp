@@ -30,17 +30,15 @@ using ProtocolValue = std::variant<
 >;
 
 class AbstractProtocol {
-    private:
-
     protected:
-        std::vector<uint8_t> constructPacket(const std::vector<uint8_t>& data);
+        std::vector<uint8_t> construct_packet(const std::vector<uint8_t>& data);
 
     public:
-        std::pair<uint8_t, std::vector<uint8_t>> deconstructPacket(const std::vector<uint8_t>& packet);
+        std::pair<uint8_t, std::vector<uint8_t>> deconstruct_packet(const std::vector<uint8_t>& packet);
 
-        std::vector<uint8_t> createRejectionPacket();
+        std::vector<uint8_t> create_rejection_packet();
 
-        virtual std::map<std::string, ProtocolValue> interpretData(const std::vector<uint8_t>& data) { return {}; };
+        virtual std::map<std::string, ProtocolValue> interpret_data(const std::vector<uint8_t>& data) { return {}; };
 
         virtual ~AbstractProtocol() = 0;
 };

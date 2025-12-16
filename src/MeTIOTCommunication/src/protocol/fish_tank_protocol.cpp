@@ -1,6 +1,6 @@
 #include "../../include/protocol/fish_tank_protocol.hpp"
 
-std::map<std::string, ProtocolValue> FishTankProtocol::interpretData(const std::vector<uint8_t>& data) {
+std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std::vector<uint8_t>& data) {
     unsigned int currentPlace = 0;
     std::map<std::string, ProtocolValue> organisedData;
     
@@ -22,7 +22,7 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpretData(const std::
                 }
 
                 // Call util to convert 2 byte array to int16_t
-                int16_t rawTemp = bytesToInt16(data, currentPlace);
+                int16_t rawTemp = bytes_to_int16(data, currentPlace);
 
                 // TODO any small transformation if required
 

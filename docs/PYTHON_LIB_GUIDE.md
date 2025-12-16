@@ -36,7 +36,7 @@ Establish a persistent TCP connection and perform the initial device identificat
     ```py
     protocol = client.get_protocol_handler()
     ```
-    **Behind the Scenes:** After the connection has happened and the device type is identified that devices unique protocol class will be assigned to the client. This protocol class comes with its own unique methods. You can find all unique device protocol methods [below](#unique-device-protocol-methods).
+    **Behind the Scenes:** After the connection has happened and the device type is identified that devices unique protocol class will be assigned to the client. This protocol class comes with its own unique methods. You can find all unique device protocol methods in the [API docs](API_REFERENCE.md).
 
 ## Receiving Data
 

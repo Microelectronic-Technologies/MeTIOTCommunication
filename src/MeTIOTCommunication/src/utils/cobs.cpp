@@ -1,6 +1,6 @@
 #include "../../include/utils/cobs.hpp"
 
-std::vector<uint8_t> cobsEncode(const std::vector<uint8_t>& data) {
+std::vector<uint8_t> cobs_encode(const std::vector<uint8_t>& data) {
   if (data.empty()) {
     return {1};
   }
@@ -36,7 +36,7 @@ std::vector<uint8_t> cobsEncode(const std::vector<uint8_t>& data) {
   return encodedBuffer;
 }
 
-std::vector<uint8_t> cobsDecode(const std::vector<uint8_t>& buffer) {
+std::vector<uint8_t> cobs_decode(const std::vector<uint8_t>& buffer) {
     if (buffer.empty()) {
         return {}; // Empty input always results in empty output
     }

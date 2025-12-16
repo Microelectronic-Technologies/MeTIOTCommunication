@@ -10,7 +10,7 @@
 
 class FishTankProtocol : public AbstractProtocol {
     public:
-        std::map<std::string, ProtocolValue> interpretData(const std::vector<uint8_t>& data) override;
+        std::map<std::string, ProtocolValue> interpret_data(const std::vector<uint8_t>& data) override;
         
         ~FishTankProtocol() override {}
 };

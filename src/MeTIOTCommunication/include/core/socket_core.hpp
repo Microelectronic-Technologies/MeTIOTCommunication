@@ -24,7 +24,7 @@ class SocketCore {
     SocketCore(const std::string& ip, int port);
     ~SocketCore();
 
-    int connectDevice();
+    int connect_device();
 
     int disconnect();
 

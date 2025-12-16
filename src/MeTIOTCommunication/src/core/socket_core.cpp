@@ -21,7 +21,7 @@ SocketCore::~SocketCore() {
 
 }
 
-int SocketCore::connectDevice() {
+int SocketCore::connect_device() {
     return connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 }
 

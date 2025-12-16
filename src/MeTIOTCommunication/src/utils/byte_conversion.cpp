@@ -1,25 +1,25 @@
 #include "../../include/utils/byte_conversion.hpp"
 
-int8_t bytesToInt8(const std::vector<uint8_t>& data, int currentPlace) {
+int8_t bytes_to_int8(const std::vector<uint8_t>& data, int currentPlace) {
     return static_cast<int8_t>(data[currentPlace]);
 }
 
-uint8_t bytesToUint8(const std::vector<uint8_t>& data, int currentPlace) {
+uint8_t bytes_to_uint8(const std::vector<uint8_t>& data, int currentPlace) {
     return data[currentPlace];
 }
 
-int16_t bytesToInt16(const std::vector<uint8_t>& data, int currentPlace) {
+int16_t bytes_to_int16(const std::vector<uint8_t>& data, int currentPlace) {
     uint16_t result = (static_cast<uint16_t>(data[currentPlace + 1]) << 8) | 
                        static_cast<uint16_t>(data[currentPlace]);
     return static_cast<int16_t>(result);
 }
 
-uint16_t bytesToUint16(const std::vector<uint8_t>& data, int currentPlace) {
+uint16_t bytes_to_uint16(const std::vector<uint8_t>& data, int currentPlace) {
     return (static_cast<uint16_t>(data[currentPlace + 1]) << 8) | 
            static_cast<uint16_t>(data[currentPlace]);
 }
 
-int32_t bytesToInt32(const std::vector<uint8_t>& data, int currentPlace) {
+int32_t bytes_to_int32(const std::vector<uint8_t>& data, int currentPlace) {
     uint32_t result = (static_cast<uint32_t>(data[currentPlace + 3]) << 24) |
                       (static_cast<uint32_t>(data[currentPlace + 2]) << 16) |
                       (static_cast<uint32_t>(data[currentPlace + 1]) << 8)  |
@@ -27,14 +27,14 @@ int32_t bytesToInt32(const std::vector<uint8_t>& data, int currentPlace) {
     return static_cast<int32_t>(result);
 }
 
-uint32_t bytesToUint32(const std::vector<uint8_t>& data, int currentPlace) {
+uint32_t bytes_to_uint32(const std::vector<uint8_t>& data, int currentPlace) {
     return (static_cast<uint32_t>(data[currentPlace + 3]) << 24) |
            (static_cast<uint32_t>(data[currentPlace + 2]) << 16) |
            (static_cast<uint32_t>(data[currentPlace + 1]) << 8)  |
             static_cast<uint32_t>(data[currentPlace]);
 }
 
-int64_t bytesToInt64(const std::vector<uint8_t>& data, int currentPlace) {
+int64_t bytes_to_int64(const std::vector<uint8_t>& data, int currentPlace) {
     uint64_t result = (static_cast<uint64_t>(data[currentPlace + 7]) << 56) |
                       (static_cast<uint64_t>(data[currentPlace + 6]) << 48) |
                       (static_cast<uint64_t>(data[currentPlace + 5]) << 40) |
@@ -46,7 +46,7 @@ int64_t bytesToInt64(const std::vector<uint8_t>& data, int currentPlace) {
     return static_cast<int64_t>(result);
 }
 
-uint64_t bytesToUint64(const std::vector<uint8_t>& data, int currentPlace) {
+uint64_t bytes_to_uint64(const std::vector<uint8_t>& data, int currentPlace) {
     return (static_cast<uint64_t>(data[currentPlace + 7]) << 56) |
            (static_cast<uint64_t>(data[currentPlace + 6]) << 48) |
            (static_cast<uint64_t>(data[currentPlace + 5]) << 40) |
@@ -57,7 +57,7 @@ uint64_t bytesToUint64(const std::vector<uint8_t>& data, int currentPlace) {
             static_cast<uint64_t>(data[currentPlace]);
 }
 
-float bytesToFloat(const std::vector<uint8_t>& data, int currentPlace) {
+float bytes_to_float(const std::vector<uint8_t>& data, int currentPlace) {
     float result;
     
     // Create a temporary 4-byte array from the data in LE order
@@ -72,7 +72,7 @@ float bytesToFloat(const std::vector<uint8_t>& data, int currentPlace) {
     return result;
 }
 
-double bytesToDouble(const std::vector<uint8_t>& data, int currentPlace) {
+double bytes_to_double(const std::vector<uint8_t>& data, int currentPlace) {
     double result;
     
     // Create a temporary 8-byte array from the data in LE order

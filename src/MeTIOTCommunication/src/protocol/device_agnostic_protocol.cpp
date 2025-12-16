@@ -5,5 +5,5 @@ std::vector<uint8_t> DeviceAgnosticProtocol::create_device_id_request() {
         static_cast<uint8_t>(Protocol::OutgoingHeader::DeviceIdentificationRequest)
     };
 
-    return constructPacket(data);
+    return construct_packet(data);
 }

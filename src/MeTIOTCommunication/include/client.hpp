@@ -29,10 +29,24 @@ class DeviceClient {
   public:
     DeviceClient(const std::string& ip, int port) : socketCore(ip, port) {}
 
+    /* @brief    Connects socket using IP and Port provided during initialization.
+     *
+     * @return   `True`  - On Success.
+     * @return   `False` - On Failure.
+     */
     bool connect();
 
+    /* @brief   Disconnects TCP socket.
+     */
     void disconnect();
 
+    /* @brief    Sends packet over TCP socket.
+     *
+     * @param    packet    The encoded packet to be sent.
+     * 
+     * @return   `True`  - On Success.
+     * @return   `False` - On Failure. 
+     */
     bool send_packet(const std::vector<uint8_t>& packet);
 
     DeviceType get_device_type() const { return deviceType; }
