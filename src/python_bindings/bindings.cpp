@@ -12,6 +12,31 @@ using KeyVector = std::vector<uint8_t>;
 // Forward declaration of the C++ function that handles the dynamic cast
 py::object cast_protocol_handler(DeviceClient& client);
 
+// ----------------- For converting python data map <str:protocolValue> to dict
+py::object protocol_value_to_py_object(const ProtocolValue& value) {
+     return std::visit([](auto&& arg) -> py::object {
+          using T = std::decay_t<decltype(arg)>;
+          if constexpr (std::is_same_v<T, double> || std::is_same_v<T, float>) {
+               return py::cast(arg);
+          } else {
+               return py::cast(static_cast<int>(arg));
+          }
+     }, value);
+}
+
+std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, const std::vector<uint8_t>& data) {
+     // Call pure cpp function
+     std::map<std::string, ProtocolValue> cppMap = self.interpretData(data);
+
+     // Translate pure cpp into python map
+     std::map<std::string, py::object> pythonMap;
+     for (const auto& [key, value] : cppMap) {
+          pythonMap[key] = protocol_value_to_py_object(value);
+     }
+     return pythonMap;
+}
+// ----------------- For converting python data map <str:protocolValue> to dict
+
 PYBIND11_MODULE(MeTIOT, m) {
      m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
 
@@ -26,18 +51,22 @@ PYBIND11_MODULE(MeTIOT, m) {
      py::class_<AbstractProtocol>(m, "AbstractProtocol")
           // Base class methods
           .def("deconstruct_packet", 
-               (std::pair<bool, std::vector<uint8_t>> (AbstractProtocol::*)(const std::vector<uint8_t>&))
+               (std::pair<uint8_t, std::vector<uint8_t>> (AbstractProtocol::*)(const std::vector<uint8_t>&))
                &AbstractProtocol::deconstructPacket, 
                py::arg("packet"), 
                "Decodes and validates a packet, returning a tuple (status, data).")
           .def("create_rejection_packet", &AbstractProtocol::createRejectionPacket,
                "Creates a rejection packet in case of an invalid message.")
+          .def("interpret_data", 
+               &wrap_interpret_data,
+               py::arg("data"),
+               "Interprets the raw payload data into a director of typed values (str:x)")
           ;
 
      // Expose a Concrete Derived Class (FishTankProtocol)
      py::class_<FishTankProtocol, AbstractProtocol>(m, "FishTankProtocol")
           // Constructor
-          .def(py::init<KeyVector&>(), py::arg("key"),
+          .def(py::init<>(),
                "Initializes the protocol handler with a symmetric encryption key.")
           ;
     

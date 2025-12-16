@@ -110,6 +110,8 @@ The Data Payload consists of one or more data points, each preceded by its own S
 > * `int16_t`
 > * `int32_t`
 > * `int64_t`
+> 
+> *All of the above unsigned variants are additionally allowed*
 >
 > The following data types *can* be used but research must first be conducted to ensure each devices architecture support the same byte length.
 >

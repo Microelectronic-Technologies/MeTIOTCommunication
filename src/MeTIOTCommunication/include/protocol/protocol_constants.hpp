@@ -20,6 +20,11 @@ namespace Protocol {
         FishTank                    = 0xFF,
     };
 
+    enum class FishTankDataSubHeader : uint8_t {
+        Temperature                 = 0xFF,
+        DataEnd                     = 0x00,
+    };
+
 }
 
 #endif

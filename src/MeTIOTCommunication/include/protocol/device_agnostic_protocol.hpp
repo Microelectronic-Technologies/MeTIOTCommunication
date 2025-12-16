@@ -21,7 +21,6 @@ What is the purpose of a "Device Agnostic Protocol"?
 
 class DeviceAgnosticProtocol : public AbstractProtocol {
     public:
-        DeviceAgnosticProtocol(std::vector<uint8_t>& key) : AbstractProtocol(key) {}
         ~DeviceAgnosticProtocol() override {}
 
         std::vector<uint8_t> create_device_id_request();

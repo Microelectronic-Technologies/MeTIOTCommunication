@@ -5,8 +5,6 @@ AbstractProtocol::~AbstractProtocol() = default;
 
 std::vector<uint8_t> AbstractProtocol::constructPacket(const std::vector<uint8_t>& data) {
     std::vector<uint8_t> crcDataBuffer;
-    std::vector<uint8_t> encryptedBuffer;
-    std::vector<uint8_t> ivBuffer;
     
     // -- Calc CRC (little endian)
     uint16_t crc = calculateCRC(data);
@@ -19,73 +17,41 @@ std::vector<uint8_t> AbstractProtocol::constructPacket(const std::vector<uint8_t
     // Copy in data
     crcDataBuffer.insert(crcDataBuffer.end(), data.begin(), data.end());
 
-    // -- Encrypt
-    encryptionHandler->encryptData(crcDataBuffer, encryptedBuffer, ivBuffer);
-
-    // Combine Encrypted data and IV
-    encryptedBuffer.insert(encryptedBuffer.end(), ivBuffer.begin(), ivBuffer.end());
-
     // -- Encode in COBS
-    std::vector<uint8_t> packet = cobsEncode(encryptedBuffer);
+    std::vector<uint8_t> packet = cobsEncode(crcDataBuffer);
 
     // Resize to actual encoded size
     return packet;
 }
 
-std::pair<bool, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet) {
-    std::vector<uint8_t> data;
-
+std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstructPacket(const std::vector<uint8_t>& packet) {
     // -- Decode COBS
-    std::vector<uint8_t> encryptedAndIVMessage = cobsDecode(packet);
-
-    // -- Decrypt
-    // Check sizing
-    if (encryptedAndIVMessage.size() < (16 + IV_SIZE)) {
-        // TODO: Handle error (Packet is too small for one encrypted block and IV)
-        return {false, {0}};
-    }
-
-    if ((encryptedAndIVMessage.size() - IV_SIZE) % 16 != 0) {
-        // TODO: Handle error (Encrypted data size is not a multiple of 16 bytes)
-        return {false, {1}};
-    }
-
-    const size_t encryptedDataSize = encryptedAndIVMessage.size() - IV_SIZE;
-
-    // Get data
-    std::vector<uint8_t> encryptedData(encryptedAndIVMessage.begin(), encryptedAndIVMessage.begin() + encryptedDataSize);
-    
-    // Get IV
-    std::vector<uint8_t> IV;
-    IV.reserve(IV_SIZE);
-
-    auto iv_start = encryptedAndIVMessage.begin() + encryptedDataSize;
-
-    IV.insert(IV.end(), iv_start, encryptedAndIVMessage.end());
-    
-    data.resize(encryptedDataSize);
-
-    encryptionHandler->decryptData(encryptedData, data, IV);
+    std::vector<uint8_t> headerAndData = cobsDecode(packet);
 
     // -- Check CRC (little endian)
-    if (data.size() < CRC_SIZE) {
+    if (headerAndData.size() < CRC_SIZE) {
         // TODO: Handle error (Decrypted data is smaller than CRC size)
-        return {false, {2}};
+        return {0, {1}};
     }
 
-    uint16_t crc = static_cast<uint16_t>(data[1] << 8) | data[0];
+    uint16_t crc = static_cast<uint16_t>(headerAndData[1] << 8) | headerAndData[0];
 
     // Remove CRC from data
-    std::shift_left(data.begin(), data.end(), CRC_SIZE);
-    data.resize(data.size() - CRC_SIZE);
+    std::shift_left(headerAndData.begin(), headerAndData.end(), CRC_SIZE);
+    headerAndData.resize(headerAndData.size() - CRC_SIZE);
 
-    bool crcCheckResult = checkCRC(crc, data);
+    bool crcCheckResult = checkCRC(crc, headerAndData);
     if (!crcCheckResult) {
         // TODO: Handle error
-        return {false, {3}};
+        return {0, {2}};
     }
 
-    return {true, data};
+    // Seperate header and data
+
+    uint8_t header = headerAndData[0];
+    std::vector<uint8_t> data(headerAndData.begin() + 1, headerAndData.end());
+
+    return {header, data};
 }
 
 std::vector<uint8_t> AbstractProtocol::createRejectionPacket() {

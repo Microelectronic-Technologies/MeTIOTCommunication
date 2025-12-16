@@ -6,10 +6,12 @@
 #include <cstdint>
 
 #include "abstract_protocol.hpp"
+#include "../utils/byte_conversion.hpp"
 
 class FishTankProtocol : public AbstractProtocol {
     public:
-        FishTankProtocol(std::vector<uint8_t>& key) : AbstractProtocol(key) {}
+        std::map<std::string, ProtocolValue> interpretData(const std::vector<uint8_t>& data) override;
+        
         ~FishTankProtocol() override {}
 };
 

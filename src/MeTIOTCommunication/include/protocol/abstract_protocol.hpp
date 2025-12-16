@@ -9,29 +9,39 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <map>
+#include <variant>
 
 #include "protocol_constants.hpp"
 #include "../utils/crc.hpp"
 #include "../utils/cobs.hpp"
-#include "../security/aes_encryption.hpp"
+
+using ProtocolValue = std::variant<
+    uint8_t,
+    int8_t,
+    int16_t,
+    uint16_t,
+    int32_t,
+    uint32_t,
+    int64_t,
+    uint64_t,
+    float,
+    double
+>;
 
 class AbstractProtocol {
     private:
-        std::unique_ptr<EncryptionHandler> encryptionHandler = nullptr;
-        uint64_t deviceID;
-        uint32_t sessionSalt;
 
     protected:
         std::vector<uint8_t> constructPacket(const std::vector<uint8_t>& data);
 
     public:
-        std::pair<bool, std::vector<uint8_t>> deconstructPacket(const std::vector<uint8_t>& packet);
+        std::pair<uint8_t, std::vector<uint8_t>> deconstructPacket(const std::vector<uint8_t>& packet);
 
         std::vector<uint8_t> createRejectionPacket();
 
-        void createEncryptionHandler(std::string passPhrase);
+        virtual std::map<std::string, ProtocolValue> interpretData(const std::vector<uint8_t>& data) { return {}; };
 
-        AbstractProtocol(uint64_t deviceID, uint32_t sessionSalt) : deviceID(deviceID), sessionSalt(sessionSalt) {}
         virtual ~AbstractProtocol() = 0;
 };
 
