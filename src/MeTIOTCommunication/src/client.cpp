@@ -1,5 +1,23 @@
 #include "../include/client.hpp"
 
+void DeviceClient::listen_loop() {
+    while (true) {
+        std::vector<uint8_t> packet;
+        int ret = socketCore.recv_data(packet);
+        if (ret == 0) {
+
+        } // TODO: Handle issues here
+
+        // Decode message
+        std::pair<uint8_t, std::vector<uint8_t>> data = protocolHandler->deconstruct_packet(packet);
+        
+        // Send to handler function
+        if (incommingMessageHandler) {
+            incommingMessageHandler->handle_message(data.first, data.second);
+        }
+    }
+}
+
 bool DeviceClient::connect() {
 
     // Connect to device
@@ -14,6 +32,20 @@ bool DeviceClient::connect() {
 
 void DeviceClient::disconnect() {
     socketCore.disconnect();
+}
+
+void DeviceClient::assign_receive_handler(std::shared_ptr<IEventHandler> handler) {
+    incommingMessageHandler = std::move(handler);
+}
+
+void DeviceClient::start_listening() {
+    if (!incommingMessageHandler) {
+        std::cout << "NO INCOMMING HANDLER"; // TODO: Change to error
+        return;
+    }
+
+    std::thread t(&DeviceClient::listen_loop, this);
+    t.detach();
 }
 
 bool DeviceClient::send_packet(const std::vector<uint8_t>& packet) {

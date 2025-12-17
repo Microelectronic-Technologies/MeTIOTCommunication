@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 #include <cstdint>
-#include <memory> 
+#include <memory>
+#include <thread>
 
 #include "core/socket_core.hpp"
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/device_agnostic_protocol.hpp"
 #include "protocol/fish_tank_protocol.hpp"
+#include "interfaces/event_handler.hpp"
 
 enum class DeviceType {
   UNKNOWN,
@@ -20,7 +22,10 @@ class DeviceClient {
   private:
     SocketCore socketCore;
     std::unique_ptr<AbstractProtocol> protocolHandler;
+    std::shared_ptr<IEventHandler> incommingMessageHandler;
     DeviceType deviceType;
+
+    void listen_loop();
 
     bool perform_device_initialization();
 
@@ -35,6 +40,10 @@ class DeviceClient {
      * @return   `False` - On Failure.
      */
     bool connect();
+
+    void assign_receive_handler(std::shared_ptr<IEventHandler> handler);
+
+    void start_listening();
 
     /* @brief   Disconnects TCP socket.
      */

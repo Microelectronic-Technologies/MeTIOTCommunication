@@ -36,11 +36,11 @@ int SocketCore::send_data(const std::vector<uint8_t>& data) {
 int SocketCore::recv_data(std::vector<uint8_t>& buffer) {
     buffer.resize(MAX_RECV_SIZE);
 
-    ssize_t bytes_received = recv(clientSocket, buffer.data(), MAX_RECV_SIZE, 0);
+    ssize_t bytesReceived = recv(clientSocket, buffer.data(), MAX_RECV_SIZE, 0);
 
-    if (bytes_received > 0) {
-        buffer.resize(bytes_received);
-    } else if (bytes_received == 0) {
+    if (bytesReceived > 0) {
+        buffer.resize(bytesReceived);
+    } else if (bytesReceived == 0) {
         // TODO: Connection closed by the peer
         return 0;
     } else {
@@ -48,5 +48,5 @@ int SocketCore::recv_data(std::vector<uint8_t>& buffer) {
         return -1;
     }
 
-    return bytes_received;
+    return bytesReceived;
 }

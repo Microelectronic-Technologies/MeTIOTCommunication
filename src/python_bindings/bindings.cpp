@@ -2,6 +2,7 @@
 #include <pybind11/stl.h> 
 
 #include "client.hpp"
+#include "PythonEventHandler.hpp"
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/fish_tank_protocol.hpp"
 
@@ -43,7 +44,7 @@ PYBIND11_MODULE(MeTIOT, m) {
      py::enum_<DeviceType>(m, "DeviceType")
         .value("UNKNOWN", DeviceType::UNKNOWN)
         .value("FISH_TANK", DeviceType::FISH_TANK)
-        .export_values();
+        .export_values(); // access via DeviceType.UNKNOWN
 
      // --- Protocols ---
 
@@ -97,7 +98,14 @@ PYBIND11_MODULE(MeTIOT, m) {
              [](DeviceClient& client) { return cast_protocol_handler(client); },
              py::return_value_policy::reference_internal,
              "Returns the protocol handler cast to its specific derived type (e.g., FishTankProtocol).")
-        ;
+          .def("assign_receive_handler", [](DeviceClient &self, py::function func) {
+               auto wrapper = std::make_shared<PythonEventHandler>(std::move(func));
+
+               self.assign_receive_handler(wrapper);
+          }, py::arg("handler_func"), "Assigns a python function to handle incoming messages.")
+          .def("start_listening", &DeviceClient::start_listening, "Starts the background network thread.")
+          .def("get_device_type", &DeviceClient::get_device_type, "Returns the type of the device.")
+             ;
 }
 
 // *** Implementation of the Casting Helper Function (No changes needed here) ***

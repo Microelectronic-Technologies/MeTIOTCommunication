@@ -20,7 +20,7 @@ MeT IoT devices broadcast their presence using Zeroconf (mDNS). The library incl
 
 Establish a persistent TCP connection and perform the initial device identification handshake.
 
-1. **Create Client:** Create a client with the devices IP & Port.
+1. **Create Client:** Create a client with the device's IP & Port.
     ```py
     import MeTIOT
 
@@ -36,7 +36,7 @@ Establish a persistent TCP connection and perform the initial device identificat
     ```py
     protocol = client.get_protocol_handler()
     ```
-    **Behind the Scenes:** After the connection has happened and the device type is identified that devices unique protocol class will be assigned to the client. This protocol class comes with its own unique methods. You can find all unique device protocol methods in the [API docs](API_REFERENCE.md).
+    **Behind the Scenes:** After the connection has happened and the device type is identified that devices unique protocol class will be assigned to the client. This protocol class comes with its own unique methods. You can find all unique device protocol methods in the [API Reference](API_REFERENCE.md).
 
 ## Receiving Data
 
@@ -45,32 +45,44 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
 > [!NOTE]
 > **Prerequisite:** You must first follow [Connecting to a Device](#connecting-to-a-device) creating a client, connecting, **and** fetching the device protocol.
 
-1. **Define a Handler:** Create a function to process the incoming data object.
+1. **Define a Handler:** Create a function to process the incoming data object. You will likely have different functions for each device type you expect to handle.
     ```py
-    def unique_device_update_handler(packet):
-        print("Received Packet")
-        # 1. Use the protocol handler to strip protocol overhead and extract header/data
-        header, data = protocol.deconstruct_packet(packet)
+    def my_update_handler(header, data):
+        print(f"Received message with header: {header}")
 
         match header:
-            case MalformedPacketNotification:
-                # Example: If a malformed packet is received (Header 0xFF), re-send most recent packet.
-                newPacket = protocol.fetch_last_packet()
-                client.send_packet(newPacket)
-            case DataTransfer:
-                # 2. Use the protocol handler to interpret the Data Payload (Sub-Headers) into a dictionary
-                dataDict = protocol.interpret_data(data)
+            case MeTIOT.Header.DataTransfer:
+                # Use the protocol handler to interpret the raw bytes into a dictionary
+                telemetry = protocol.interpret_data(data)
+                print(f"Temperature: {telemetry['Temperature_C']} C")
+
+            case MeTIOT.Header.MalformedPacketNotification:
+                print("Device reported a communication error.")
+                # Since the library is stateless, you must track your 
+                # last sent packet locally if you wish to re-send it.
+
             case _:
-                # Handle other unique device commands as defined by the protocol
+                # Handle other commands defined in the API Reference
                 pass
     ```
 
 2. **Register the Handler:** Attach the handler to the client instance.
     ```py
-    client.on_data_received(unique_device_update_handler)
-    ```
+    # --- To assign all devices the same handler ---
+    client.on_data_received(my_update_handler)
 
-3. **Start Listening:** The client will automatically start a background thread to listen for messages.
+    #   OR
+    # --- To assign different devices types unique handlers ---
+    #
+    # devType = client.get_device_type() # Fetch the current device type
+    #
+    # if (devType == MeTIOT.DeviceType.FISH_TANK):
+    #     client.on_data_received(fish_tank_update_handler)
+    # elif (devType == MeTIOT.DeviceType.UNKNOWN):
+    #     print("Unknown device type. Assigning generic handler")
+    #     client.on_data_received(generic_update_handler)
+    ```
+    **Behind the Scenes:** The client initiates a background listener thread to monitor the socket. When a message is detected, the library automatically handles the decoding and verification (CRC/COBS). It segregated the payload into its `header` and `data` components and dispatches them directly to your handler.
 
 ## Sending Commands
 
@@ -91,4 +103,4 @@ To send a command (like changing a setting), use the client objects protocol han
     client.send_packet(packet)
     print("Calibration request packet sent.")
     ```
-    **Behind the Scenes:** The `protocol` method handles the specific command, including any required Sub-Headers and Data. It then automatically adds the standard protocol overhead (CRC and COBS), returning a complete, byte-stuffed buffer ready for transmission. The client then sends this buffer over the TCP socket.
+    **Behind the Scenes:** The protocol handler wraps your command with mandatory overhead (CRC and COBS encoding), ensuring the device can validate the integrity of the message upon receipt.
