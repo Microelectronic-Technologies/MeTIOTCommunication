@@ -6,14 +6,14 @@ SocketCore::SocketCore(const std::string& ip, int port) {
 
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket < 0) {
-        // TODO: Handle error
+        throw SocketError("Socket: Failed to create socket object.");
     }
 
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(serverPORT);
 
     if (inet_pton(AF_INET, serverIP.c_str(), &(serverAddress.sin_addr)) <= 0) {
-        // TODO: Handle error. Invalid address or address not supported
+        throw SocketError("Socket: Invalid/Not Supported IP Address.");
     }
 }
 
@@ -41,11 +41,9 @@ int SocketCore::recv_data(std::vector<uint8_t>& buffer) {
     if (bytesReceived > 0) {
         buffer.resize(bytesReceived);
     } else if (bytesReceived == 0) {
-        // TODO: Connection closed by the peer
-        return 0;
+        throw SocketError("Socket: Connection closed by peer.");
     } else {
-        // TODO: Error occurred
-        return -1;
+        throw SocketError("Socket: Error occured during read.");
     }
 
     return bytesReceived;

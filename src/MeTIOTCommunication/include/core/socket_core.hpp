@@ -11,6 +11,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include "exceptions.hpp"
+
 #define MAX_RECV_SIZE 1024
 
 class SocketCore {

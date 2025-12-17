@@ -42,9 +42,7 @@ std::vector<uint8_t> cobs_decode(const std::vector<uint8_t>& buffer) {
     }
 
     if (buffer.back() != 0x00 || buffer.size() == 1) {
-      // TODO: Handle error (no delim)
-      std::cout << "Buffer doesn't end in 0x00" << std::endl;
-      return {};
+      throw EncodingError("COBS: Buffer doesn't end in deliminator (0x00).");
     }
     
     std::vector<uint8_t> decoded_data;
@@ -56,17 +54,13 @@ std::vector<uint8_t> cobs_decode(const std::vector<uint8_t>& buffer) {
       uint8_t code = buffer[buffer_index++];
         
       if (code == 0) {
-        // TODO: Handle error (Delim early)
-        std::cout << "Found delim early" << std::endl;
-        return {};
+        throw EncodingError("COBS: Deliminator occured too early during decoding.");
       }
         
       uint8_t block_size = code - 1;
 
     if (buffer_index + block_size > buffer.size() - 1) {
-      // TODO: Handle error
-      std::cout << "Block size would overrun the buff before delim" << std::endl;
-      return {};
+      throw EncodingError("COBS: Bad block size detected during decoding.");
     }
 
     std::copy(

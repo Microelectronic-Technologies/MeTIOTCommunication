@@ -7,6 +7,7 @@
 
 #include "abstract_protocol.hpp"
 #include "../utils/byte_conversion.hpp"
+#include "../core/exceptions.hpp"
 
 class FishTankProtocol : public AbstractProtocol {
     public:

@@ -42,6 +42,25 @@ std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, co
 PYBIND11_MODULE(MeTIOT, m) {
      m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
 
+     // --- Exceptions ---
+     static py::exception<LibraryError> lib_exc(m, "LibraryError", PyExc_RuntimeError);
+     static py::exception<SocketError> sock_exc(m, "SocketError", lib_exc.ptr());
+     static py::exception<ProtocolError> prot_exc(m, "ProtocolError", lib_exc.ptr());
+     static py::exception<EncodingError> enc_exc(m, "EncodingError", lib_exc.ptr());
+
+     py::register_exception_translator([](std::exception_ptr p) {
+          try {
+               if (p) std::rethrow_exception(p);
+          } catch (const SocketError &e) {
+               py::set_error(sock_exc, e.what());
+          } catch (const ProtocolError &e) {
+               py::set_error(prot_exc, e.what());
+          } catch (const EncodingError &e) {
+               py::set_error(enc_exc, e.what());
+          } catch (const LibraryError &e) {
+               py::set_error(lib_exc, e.what());
+          }
+     });
 
      // --- Enums --- 
      py::enum_<DeviceType>(m, "DeviceType")
@@ -54,6 +73,7 @@ PYBIND11_MODULE(MeTIOT, m) {
 
      py::enum_<Protocol::IncomingHeader::General>(inc, "General")
           .value("MalformedPacket", Protocol::IncomingHeader::General::MalformedPacketNotification)
+          // Exclude DeviceIdentifier as it's not used in python
           .value("Data", Protocol::IncomingHeader::General::Data)
           .export_values();
 

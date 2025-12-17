@@ -5,7 +5,7 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
     std::map<std::string, ProtocolValue> organisedData;
     
     if (data.empty()) {
-        // TODO: Throw error (Empty data)
+        throw ProtocolError("Protocol: Data is empty.");
     }
 
     while (currentPlace < data.size()) {
@@ -18,7 +18,7 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
                 // Verify theres enough space in data vector to contain this
                 const size_t DATA_SIZE = 2; // Byte count of int16_t
                 if (currentPlace + DATA_SIZE > data.size()) {
-                    // TODO: Throw error (Not enough space left in data vector to contain this data)
+                    throw ProtocolError("Protocol: Not enough space left in data vector to read data defined in data sub header.");
                 }
 
                 // Call util to convert 2 byte array to int16_t
@@ -37,10 +37,9 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
                 return organisedData;
             }
             default: {
-                // TODO: Throw error here (Unknown data)
-                return organisedData;
+                throw ProtocolError("Protocol: Unknown data sub header occured.");
             }
         }
     }
-    // TODO: Throw error here (Did not find end of data sub header)
+    throw ProtocolError("Protocol: No end of data sub header was present in data.");
 }

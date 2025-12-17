@@ -25,13 +25,16 @@ std::vector<uint8_t> AbstractProtocol::construct_packet(const std::vector<uint8_
 }
 
 std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(const std::vector<uint8_t>& packet) {
+    if (packet.empty()) {
+        throw ProtocolError("Protocol: Packet size before COBS decoding is not big enough.");
+    }
+
     // -- Decode COBS
     std::vector<uint8_t> headerAndData = cobs_decode(packet);
 
     // -- Check CRC (little endian)
     if (headerAndData.size() < CRC_SIZE) {
-        // TODO: Handle error (Decrypted data is smaller than CRC size)
-        return {0, {1}};
+        throw ProtocolError("Protocol: Packet size after COBS decoding is not big enough to contain data.");
     }
 
     uint16_t crc = static_cast<uint16_t>(headerAndData[1] << 8) | headerAndData[0];
@@ -42,8 +45,7 @@ std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(co
 
     bool crcCheckResult = check_crc(crc, headerAndData);
     if (!crcCheckResult) {
-        // TODO: Handle error
-        return {0, {2}};
+        throw EncodingError("CRC: CRC failed check failed.");
     }
 
     // Seperate header and data

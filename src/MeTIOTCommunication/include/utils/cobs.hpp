@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <iostream>
 
+#include "../core/exceptions.hpp"
+
 /* @brief    Encodes the data using COBS
  *
  * @param    data      Data that is being encoded

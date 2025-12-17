@@ -15,6 +15,7 @@
 #include "protocol_constants.hpp"
 #include "../utils/crc.hpp"
 #include "../utils/cobs.hpp"
+#include "../core/exceptions.hpp"
 
 using ProtocolValue = std::variant<
     uint8_t,
