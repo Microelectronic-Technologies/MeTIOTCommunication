@@ -13,6 +13,8 @@
 #include "protocol/fish_tank_protocol.hpp"
 #include "interfaces/event_handler.hpp"
 
+#define FATAL_WARNING_THRESHOLD 10
+
 enum class DeviceType {
   UNKNOWN,
   FISH_TANK,
@@ -22,8 +24,9 @@ class DeviceClient {
   private:
     SocketCore socketCore;
     std::unique_ptr<AbstractProtocol> protocolHandler;
-    std::shared_ptr<IEventHandler> incommingMessageHandler;
+    std::shared_ptr<IEventHandler> callbackHandler;
     DeviceType deviceType;
+    uint64_t uniqueDeviceID;
 
     void listen_loop();
 
@@ -52,11 +55,10 @@ class DeviceClient {
     /* @brief    Sends packet over TCP socket.
      *
      * @param    packet    The encoded packet to be sent.
-     * 
-     * @return   `True`  - On Success.
-     * @return   `False` - On Failure. 
      */
-    bool send_packet(const std::vector<uint8_t>& packet);
+    void send_packet(const std::vector<uint8_t>& packet);
+
+    uint64_t get_unique_id();
 
     DeviceType get_device_type() const { return deviceType; }
     AbstractProtocol* get_protocol_handler() const { return protocolHandler.get(); }

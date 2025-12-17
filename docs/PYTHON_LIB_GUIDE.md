@@ -45,15 +45,16 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
 > [!NOTE]
 > **Prerequisite:** You must first follow [Connecting to a Device](#connecting-to-a-device) creating a client, connecting, **and** fetching the device protocol.
 
-1. **Define a Handler:** Create a function to process the incoming data object. You will likely have different functions for each device type you expect to handle.
+1. **Define Async Callbacks:** Create function to process incoming data object, warning messages, and fatal errors. You will likely have different data processing function for each device type you expect to handle.
     ```py
-    def my_update_handler(header, data):
-        print(f"Received message with header: {header}")
+    def my_update_handler(device, header, data):
+        print(f"Received message from {device.get_unique_id()} with header: {header}")
 
         match header:
             case MeTIOT.Incoming.General.Data:
                 # Use the protocol handler to interpret the raw bytes into a dictionary
-                telemetry = protocol.interpret_data(data)
+                deviceProtocol = device.get_protocol_handler()
+                telemetry = deviceProtocol.interpret_data(data)
                 print(f"Temperature: {telemetry['Temperature_C']} C")
 
             case MeTIOT.Incoming.MalformedPacketNotification:
@@ -68,12 +69,26 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
             case _:
                 # Handle other commands defined in the API Reference
                 pass
+
+    def warning_handler(device, msg):
+        # This function is optional
+        #
+        # When this function is called the warning handling is already handled by the library. This function is just for debugging.
+        print(f"Device {device.get_unique_id()} has non-fatal warning: {msg}")
+
+    def error_handler(device, msg):
+        # This function is optional
+        #
+        # When this function is called a fatal error has occured and the listening loop has stopped. The device will no longer listen for messages.
+        print(f"Device {device.get_unique_id()} has fatal error: {msg}")
     ```
 
-2. **Register the Handler:** Attach the handler to the client instance.
+2. **Register the Handler/s:** Attach the handler/s to the client instance.
     ```py
     # --- To assign all devices the same handler ---
-    client.on_data_received(my_update_handler)
+    client.assign_handlers(on_data=my_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    # If you do not want to specify an on_warning or on_fatal handler they can both be removed
+    # client.assign_handlers(on_data=my_update_handler)
 
     #   OR
     # --- To assign different devices types unique handlers ---
@@ -81,10 +96,10 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
     # devType = client.get_device_type() # Fetch the current device type
     #
     # if (devType == MeTIOT.DeviceType.FISH_TANK):
-    #     client.on_data_received(fish_tank_update_handler)
+    #     client.assign_handlers(on_data=fish_tank_update_handler, on_warning=warning_handler, on_fatal=error_handler)
     # elif (devType == MeTIOT.DeviceType.UNKNOWN):
     #     print("Unknown device type. Assigning generic handler")
-    #     client.on_data_received(generic_update_handler)
+    #     client.assign_handlers(on_data=generic_update_handler, on_warning=warning_handler, on_fatal=error_handler)
     ```
     **Behind the Scenes:** The client initiates a background listener thread to monitor the socket. When a message is detected, the library automatically handles the decoding and verification (CRC/COBS). It segregated the payload into its `header` and `data` components and dispatches them directly to your handler.
 

@@ -134,14 +134,18 @@ PYBIND11_MODULE(MeTIOT, m) {
              [](DeviceClient& client) { return cast_protocol_handler(client); },
              py::return_value_policy::reference_internal,
              "Returns the protocol handler cast to its specific derived type (e.g., FishTankProtocol).")
-          .def("assign_receive_handler", [](DeviceClient &self, py::function func) {
-               auto wrapper = std::make_shared<PythonEventHandler>(std::move(func));
+          .def("assign_handlers", [](DeviceClient &self, py::function data_cb, 
+                                     py::object warn_cb, py::object fatal_cb) {
+               auto handler = std::make_shared<PythonEventHandler>(data_cb, warn_cb, fatal_cb);
 
-               self.assign_receive_handler(wrapper);
-          }, py::arg("handler_func"), "Assigns a python function to handle incoming messages.")
+               self.assign_receive_handler(handler);
+          }, py::arg("on_data"), 
+             py::arg("on_warning") = py::none(), 
+             py::arg("on_fatal") = py::none(), "Assigns a python function to handle incoming messages.")
           .def("start_listening", &DeviceClient::start_listening, "Starts the background network thread.")
           .def("get_device_type", &DeviceClient::get_device_type, "Returns the type of the device.")
-             ;
+          .def("get_unique_id", &DeviceClient::get_unique_id, "Returns the 64-bit hardware UID.")   
+          ;
 }
 
 // *** Implementation of the Casting Helper Function (No changes needed here) ***

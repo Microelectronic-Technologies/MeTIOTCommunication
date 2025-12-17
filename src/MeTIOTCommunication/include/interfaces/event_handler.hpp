@@ -16,11 +16,17 @@ How to use it: There should be no reason to directly touch this file at all. If 
 #include <vector>
 #include <cstdint>
 
+class DeviceClient; // Fix circular dependency
+
 class IEventHandler {
 public:
     virtual ~IEventHandler() = default;
 
-    virtual void handle_message(int packet_id, const std::vector<uint8_t>& payload) = 0;
+    virtual void handle_message(DeviceClient* client, int packet_id, const std::vector<uint8_t>& payload) = 0;
+
+    virtual void handle_warning(DeviceClient* client, const std::string& message) = 0;
+
+    virtual void handle_fatal_error(DeviceClient* client, const std::string& message) = 0;
 };
 
 #endif
