@@ -5,6 +5,7 @@
 #include "PythonEventHandler.hpp"
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/fish_tank_protocol.hpp"
+#include "protocol/protocol_constants.hpp"
 
 namespace py = pybind11;
 
@@ -41,10 +42,24 @@ std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, co
 PYBIND11_MODULE(MeTIOT, m) {
      m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
 
+
+     // --- Enums --- 
      py::enum_<DeviceType>(m, "DeviceType")
         .value("UNKNOWN", DeviceType::UNKNOWN)
         .value("FISH_TANK", DeviceType::FISH_TANK)
         .export_values(); // access via DeviceType.UNKNOWN
+
+     // Incoming headers
+     py::module_ inc = m.def_submodule("Incoming", "Protocol Headers");
+
+     py::enum_<Protocol::IncomingHeader::General>(inc, "General")
+          .value("MalformedPacket", Protocol::IncomingHeader::General::MalformedPacketNotification)
+          .value("Data", Protocol::IncomingHeader::General::Data)
+          .export_values();
+
+     py::enum_<Protocol::IncomingHeader::FishTank>(inc, "FishTank")
+          .export_values();
+
 
      // --- Protocols ---
 
@@ -71,6 +86,7 @@ PYBIND11_MODULE(MeTIOT, m) {
                "Initializes the protocol handler with a symmetric encryption key.")
           ;
     
+
      // --- DeviceClient ---
 
      py::class_<DeviceClient>(m, "DeviceClient")

@@ -13,8 +13,8 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
         uint8_t subheader = data[currentPlace];
         currentPlace += 1; // Move past the subheader
 
-        switch(static_cast<Protocol::FishTankDataSubHeader>(subheader)) {
-            case (Protocol::FishTankDataSubHeader::Temperature): {
+        switch(static_cast<Protocol::DataSubHeader::FishTank>(subheader)) {
+            case (Protocol::DataSubHeader::FishTank::Temperature): {
                 // Verify theres enough space in data vector to contain this
                 const size_t DATA_SIZE = 2; // Byte count of int16_t
                 if (currentPlace + DATA_SIZE > data.size()) {
@@ -32,7 +32,7 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
                 currentPlace += DATA_SIZE;
                 break;
             }
-            case (Protocol::FishTankDataSubHeader::DataEnd): {
+            case (Protocol::DataSubHeader::FishTank::DataEnd): {
                 // Data terminator found
                 return organisedData;
             }

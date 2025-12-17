@@ -51,15 +51,19 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
         print(f"Received message with header: {header}")
 
         match header:
-            case MeTIOT.Header.DataTransfer:
+            case MeTIOT.Incoming.General.Data:
                 # Use the protocol handler to interpret the raw bytes into a dictionary
                 telemetry = protocol.interpret_data(data)
                 print(f"Temperature: {telemetry['Temperature_C']} C")
 
-            case MeTIOT.Header.MalformedPacketNotification:
+            case MeTIOT.Incoming.MalformedPacketNotification:
                 print("Device reported a communication error.")
-                # Since the library is stateless, you must track your 
-                # last sent packet locally if you wish to re-send it.
+                # Since the library is stateless, you must track your last
+                # sent packet locally if you wish to re-send it (Recommended).
+
+            # Example of modular expansion for specific devices
+            # case MeTIOT.Incoming.FishTank.SpecificAlert:
+            #     print("Fish tank alert!")
 
             case _:
                 # Handle other commands defined in the API Reference
