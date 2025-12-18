@@ -16,6 +16,7 @@ What is the purpose of a "Device Agnostic Protocol"?
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <cstring>
 
 #include "abstract_protocol.hpp"
 
@@ -24,6 +25,8 @@ class DeviceAgnosticProtocol : public AbstractProtocol {
         ~DeviceAgnosticProtocol() override {}
 
         std::vector<uint8_t> create_device_id_request();
+
+        std::pair<uint8_t, uint64_t> extract_device_details(const std::vector<uint8_t>& data);
 };
 
 #endif

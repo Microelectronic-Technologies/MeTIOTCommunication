@@ -49,7 +49,6 @@ std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(co
     }
 
     // Seperate header and data
-
     uint8_t header = headerAndData[0];
     std::vector<uint8_t> data(headerAndData.begin() + 1, headerAndData.end());
 

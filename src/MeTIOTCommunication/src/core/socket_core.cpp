@@ -33,7 +33,8 @@ int SocketCore::send_data(const std::vector<uint8_t>& data) {
     return send(clientSocket, data.data(), data.size(), 0);
 }
 
-int SocketCore::recv_data(std::vector<uint8_t>& buffer) {
+std::vector<uint8_t> SocketCore::recv_data() {
+    std::vector<uint8_t> buffer;
     buffer.resize(MAX_RECV_SIZE);
 
     ssize_t bytesReceived = recv(clientSocket, buffer.data(), MAX_RECV_SIZE, 0);
@@ -46,5 +47,5 @@ int SocketCore::recv_data(std::vector<uint8_t>& buffer) {
         throw SocketError("Socket: Error occured during read.");
     }
 
-    return bytesReceived;
+    return buffer;
 }

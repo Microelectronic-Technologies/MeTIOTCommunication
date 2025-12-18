@@ -1,19 +1,101 @@
 # API Reference
 
-This documentation provides a comprehensive list of all public methods, properties, and constants exposed by the MeT IoT Python client library (`MeTIOT`).
+The `MeTIOT` library provides a high-level interface for interacting with MeTIOT IoT devices via TCP. The core of the library is the `DeviceClient`, which manages the connection, event loops, and protocol handling.
 
 ## 1. Client Library Components (`MeTIOT`)
 
-### 1.1 `MeTIOT.DeviceClient` (Main Class)
+The `DeviceClient` class is the primary entry point for all device interactions.
 
-| Property/Method | Type | Description |
+### Lifecycle Management
+
+#### `DeviceClient(ip: str, port: int)`
+
+*Constructor* | **Module:** `MeTIOT`
+
+Initializes the client object with the target device's network information.
+
+* **Arguments**
+    * `ip` (str): IPv4 address of the device.
+    * `port` (int): Communication port.
+* **Errors:** Raises `SocketError` if the IP address is invalid or unsupported.
+
+#### `connect()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Establishes the TCP connection and performs initial handshake/device discovery.
+
+* **Errors:** Raises `SocketError` if the device is unreachable.
+
+#### `disconnect()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Safely closes the active TCP connection.
+
+### Protocol & Identity
+
+#### `get_protocol_handler()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Returns the `ProtocolHandler` specific to the current device type. use this to encode/decode bytes.
+
+* **Returns:** `ProtocolHandler`
+
+> [!TIP]
+> Use this instead of the deprecated `get_specific_protocol_handler()`
+
+#### `get_unique_id()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Retrieves the globally unique 64-bit ID assigned to the hardware.
+
+* **Returns:** 8-byte Device ID.
+
+#### `get_device_type()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Identifies the model/type of the connected device.
+
+* **Returns:** `MeTIOT.DeviceType`
+
+### Asynchronous Operations
+
+#### `assign_handlers(on_data, on_warning=None, on_fatal=None)`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Registers callback functions for the background listening thread.
+
+| Argument | Signature | Description |
 |-|-|-|
-| `__init__(ip: str, port: int)` | Constructor | Initializes the client. |
-| `connect()` | Method | Establishes the TCP connection and performs the device initialization. |
-| `disconnect()` | Method | Closes the TCP connection. |
-| `on_data_received(handler: callable)` | Method | Register a callback function to handle raw incoming packet buffers. Handler signature: `handler(packet: bytes)`. |
-| `get_protocol_handler()` | Method | **Returns the device-specific protocol handler instance.** Must be called after `connect()`. |
-| `send_packet(packet: bytes)` | Method | Sends a pre-constructed packet buffer over the TCP connection. |
+| `on_data` | `(device, header, data)` | Triggered on successful packet reception. |
+| `on_warning` | `(device, msg)` | **Optional.** Triggered on non-fatal issues (e.g., CRC mismatch). |
+| `on_fatal` | `(device, msg)` | **Optional.** Triggered when the loop crashes or 10 warnings occur |
+
+#### `start_listening()`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Spawns a background thread to monitor the TCP socket. **Requires handlers to be assigned first.**
+
+* **Errors:** `LibraryError` if `assign_handlers` has not been called.
+
+#### `send_packet(packet: bytes)`
+
+*Method* | **Module:** `MeTIOT.DeviceClient`
+
+Sends a raw byte buffer to the device.
+
+* **Arguments:** `packet` (bytes): The encoded payload.
+* **Errors:** `SocketError` on transmission failure.
+
+
+> [!IMPORTANT]
+> **WIP** Document. Below text may not be correct.
 
 ## 2. Protocol Handler Methods (Accessed via `client.get_protocol_handler()`)
 

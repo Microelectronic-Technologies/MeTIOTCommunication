@@ -32,7 +32,7 @@ class SocketCore {
 
     int send_data(const std::vector<uint8_t>& data);
 
-    int recv_data(std::vector<uint8_t>& buffer);
+    std::vector<uint8_t> recv_data();
 };
 
 #endif
