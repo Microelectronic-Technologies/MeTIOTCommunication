@@ -33,6 +33,8 @@ Establishes the TCP connection and performs initial handshake/device discovery.
 
 Safely closes the active TCP connection.
 
+---
+
 ### Protocol & Identity
 
 #### `get_protocol_handler()`
@@ -61,6 +63,8 @@ Retrieves the globally unique 64-bit ID assigned to the hardware.
 Identifies the model/type of the connected device.
 
 * **Returns:** `MeTIOT.DeviceType`
+
+---
 
 ### Asynchronous Operations
 
