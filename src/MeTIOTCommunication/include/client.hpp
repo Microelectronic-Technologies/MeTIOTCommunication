@@ -28,6 +28,7 @@ class DeviceClient {
     std::shared_ptr<IEventHandler> callbackHandler;
     DeviceType deviceType;
     uint64_t uniqueDeviceID;
+    bool initialized = false;
 
     /* @brief   TCP Listening thread function
      */
@@ -81,13 +82,13 @@ class DeviceClient {
 
     /* @brief   Retrieves device type of the device in this class instance.
      */
-    DeviceType get_device_type() const { return deviceType; }
+    DeviceType get_device_type() const;
 
     /* @brief   Retrieves protocolHandler of the device in this class instance.
      *
      * @note    To get access to protocol specific methods (in the child classes) this pointer must be cast to the appropriate child.
      */
-    AbstractProtocol* get_protocol_handler() const { return protocolHandler.get(); }
+    AbstractProtocol* get_protocol_handler() const;
 };
 
 #endif

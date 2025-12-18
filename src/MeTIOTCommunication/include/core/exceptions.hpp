@@ -23,4 +23,8 @@ class EncodingError : public LibraryError {
     using LibraryError::LibraryError;
 };
 
+class LogicError : public LibraryError {
+    using LibraryError::LibraryError;
+};
+
 #endif

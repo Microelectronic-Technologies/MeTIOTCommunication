@@ -47,6 +47,7 @@ PYBIND11_MODULE(MeTIOT, m) {
      static py::exception<SocketError> sock_exc(m, "SocketError", lib_exc.ptr());
      static py::exception<ProtocolError> prot_exc(m, "ProtocolError", lib_exc.ptr());
      static py::exception<EncodingError> enc_exc(m, "EncodingError", lib_exc.ptr());
+     static py::exception<LogicError> log_exc(m, "LogicError", lib_exc.ptr());
 
      py::register_exception_translator([](std::exception_ptr p) {
           try {
@@ -57,6 +58,8 @@ PYBIND11_MODULE(MeTIOT, m) {
                py::set_error(prot_exc, e.what());
           } catch (const EncodingError &e) {
                py::set_error(enc_exc, e.what());
+          } catch (const LogicError &e) {
+               py::set_error(log_exc, e.what());
           } catch (const LibraryError &e) {
                py::set_error(lib_exc, e.what());
           }

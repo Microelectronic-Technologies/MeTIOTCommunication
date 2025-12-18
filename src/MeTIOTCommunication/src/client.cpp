@@ -64,7 +64,7 @@ void DeviceClient::assign_receive_handler(std::shared_ptr<IEventHandler> handler
 
 void DeviceClient::start_listening() {
     if (!callbackHandler) {
-        throw LibraryError("Library: You must first define a callbackHandler");
+        throw LogicError("Logic: You must first define a callbackHandler");
     }
 
     std::thread t(&DeviceClient::listen_loop, this);
@@ -98,6 +98,20 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
             return false;
         }
     }
+}
+
+AbstractProtocol* DeviceClient::get_protocol_handler() const { 
+    if (initialized) {
+        return protocolHandler.get(); 
+    }
+    throw LogicError("Logic: Device has not been initialized");
+}
+
+DeviceType DeviceClient::get_device_type() const { 
+    if (initialized) {
+        return deviceType;
+    }
+    throw LogicError("Logic: Device has not been initialized");
 }
 
 void DeviceClient::perform_device_initialization() {
@@ -143,4 +157,6 @@ void DeviceClient::perform_device_initialization() {
             break;
         }
     }
+
+    initialized = true;
 }
