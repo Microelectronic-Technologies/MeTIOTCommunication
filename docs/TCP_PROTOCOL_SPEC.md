@@ -126,14 +126,57 @@ This section details the custom commands and data formats specific to the Fish T
 
 | Purpose | Data Header | Data Payload | Bytes |
 |-|-|-|-|
+| Sensor Attribute Request | `0xFC` | None | 1 |
+| Calibration Values | `0xFB` | *To be decided* | |
 
 ### Fish Tank: Device-to-Library Commands
 
 | Purpose | Data Header | Data Payload | Bytes |
 |-|-|-|-|
+| Sensor Attribute Response | `0xFC` | *To be decided* | |
+| Calibration Finished | `0xFB` | 1-Byte Sensor Address | 2 | 
 
 ### Fish Tank: Data Sub-Header
 
+> [!NOTE]
+> Values marked with *(decimal value)* are multiplied by 100 before transmission then divided by 100 when being interpreted. This only gives an accuracy of up to 2 decimal places.
+
 | Sub-Header | Data Field | Data Type |
 |-|-|-|
-| 0x00 | Data End | (None/Blank) |
+| `0xFF` | Temperature *(decimal value)* | `int16_t` |
+| `0xFE` | Humidity *(decimal value)* | `uint16_t` |
+| `0xFD` | pH *(decimal value)* | `uint16_t` |
+| `0xFC` | Oxidation-Reduction Potential | `int16_t` | 
+| `0xFB` | Dissolved Oxygen | `int16_t` |
+| `0xFA` | Conductivity | `int16_t` |
+| `0x00` | Data End | (None/Blank) |
+
+### Fish Tank: Sensor Attribute Aquisition
+
+During the devices startup it allocates a unique I2C address and stores the device type for all devices on the I2C bus. For later use (like calibration) we will need to store this information so we know what types of devices are currently associated with the device.
+
+#### Sensor Attribute Response Command
+
+I2C Address:Device Type pair can repeat as many times as required.
+
+![Fish Tank Sensor Attribute Response](images/FishTankSensorAttributeResponse.jpg)
+
+#### Sensor Device Types
+
+> [!NOTE]
+> A Fish Tank device can have multiple of the same type of device so its important to sort by their I2C address not.
+
+| Code | Device Type |
+|-|-|
+| `0xFF` | Temeprature Sensor |
+| `0xFE` | Humidity Sensor |
+| `0xFD` | pH Sensor |
+| `0xFC` | Oxidation-Reduction Potential Sensor |
+| `0xFB` | Dissolved Oxygen Sensor |
+| `0xFA` | Conductivity Sensor |
+
+### Fish Tank: Calibration
+
+#### Calibration Values Command
+
+#### Calibration Finished Command
