@@ -6,9 +6,15 @@ This guide provides practical steps for using the MeT IoT Python client library.
 
 The MeT IoT library is *soon to be* available on PyPI.
 
-```bash
-pip install x
+```sh
+pip install MeTIOT
 ```
+
+> [!NOTE]
+> This library is not pre-compiled.
+> You must have installed on your system (Other version may work but are official unsupported):
+> * GCC >= 15.2.1
+> * CMake >= 3.10
 
 ## Device Discovery
 

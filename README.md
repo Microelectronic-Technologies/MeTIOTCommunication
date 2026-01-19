@@ -1,14 +1,41 @@
 # MeT IOT Communication
 
-## Protocol Information
-
-Communication between MeT IOT devices and this library are conducted over TCP sockets. To see more in-depth details about this protocol including encryption standard see [Protocol Docs](docs/Protocol.md)
-
 ## How To Use
 
-For all information on **how** to use go to [HowToUse Docs](docs/HowToUse.md). Also see examples of use in the [Examples folder](examples/)
+### Importing the Library
 
-## How to Compile
+#### Use pip to install the library
+
+```sh
+pip install MeTIOT
+```
+
+> [!NOTE]
+> This library is not pre-compiled.
+> You must have installed on your system (Other version may work but are official unsupported):
+> * GCC >= 15.2.1
+> * CMake >= 3.10
+
+### Programming with the Library
+
+#### Testing the library imported successfully
+
+You can use this code to test you can successfully import the library into your code.
+
+```py
+import MeTIOT
+
+client = MeTIOT.DeviceClient("0.0.0.0", 12345)
+
+print(type(client))
+print("MeTIOT import successful!")
+```
+
+#### Using the library
+
+For further information on how to use this library refer to the [PYTHON_LIB_GUIDE.md document](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md).
+
+## How to Compile (Manual. For Testing)
 
 Linux based systems:
 
@@ -36,10 +63,4 @@ client = MeTIOT.DeviceClient("0.0.0.0", 12345)
 type(client)
 client.connect()
 ```
-
-## How to Add More Features
-
-**WIP** docs
-
-
 

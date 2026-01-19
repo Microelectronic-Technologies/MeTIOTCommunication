@@ -1,10 +1,10 @@
 [build-system]
 requires = ["scikit-build-core", "pybind11"]
-build-backend = "scikit-build_core.build"
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "MeTIOT"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     { name="Cody Jackson", email="cjackson@micr.com.au" }
 ]
@@ -14,3 +14,8 @@ requires-python = ">=3.8"
 
 [tool.scikit-build]
 cmake.version = ">=3.15"
+
+[project.urls]
+"Homepage" = "https://github.com/Microelectronic-Technologies/MeTIOTCommunication"
+"API Reference" = "https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/API_REFERENCE.md"
+"Protocol Spec" = "https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/DEVICE_PROTOCOL_DEV_GUIDE.md"
