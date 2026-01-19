@@ -24,9 +24,9 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
                 // Call util to convert 2 byte array to int16_t
                 int16_t rawTemp = bytes_to_int16(data, currentPlace);
 
-                // TODO any small transformation if required
+                float tempC = rawTemp / 100.0;
 
-                organisedData["Temperature_C"] = rawTemp;
+                organisedData["Temperature_C"] = tempC;
 
                 // Move pointer
                 currentPlace += DATA_SIZE;
@@ -41,5 +41,7 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
             }
         }
     }
-    throw ProtocolError("Protocol: No end of data sub header was present in data.");
+    
+    // throw ProtocolError("Protocol: No end of data sub header was present in data."); // * No strictly required
+    return organisedData;
 }

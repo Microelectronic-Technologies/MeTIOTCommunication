@@ -6,13 +6,7 @@ pybind11_add_module(
 target_link_libraries(
     MeTIOT 
     PRIVATE 
-
-    # Core C++ Library
     MeTIOTCommunication
-
-    # OpenSSL Library 
-    OpenSSL::SSL 
-    OpenSSL::Crypto
 )
 
 target_include_directories(
@@ -20,3 +14,5 @@ target_include_directories(
     PRIVATE 
     $<TARGET_PROPERTY:MeTIOTCommunication,INTERFACE_INCLUDE_DIRECTORIES>
 )
+
+install(TARGETS MeTIOT LIBRARY DESTINATION .)

@@ -42,7 +42,6 @@ public:
 private:
     void handle_py_error(py::error_already_set &e) {
         std::cerr << "Exception in Python callback: " << e.what() << std::endl;
-        // Optionally: e.restore() if you want the error to propagate back to the main thread
     }
 
     py::function data_cb_;

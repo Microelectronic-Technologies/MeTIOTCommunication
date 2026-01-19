@@ -129,6 +129,7 @@ void DeviceClient::perform_device_initialization() {
     // to first send a data packet before it sends the deviceIDResponse.
     uint8_t loopCount = 0;
     while (true) {
+        // TODO: Time based fail condition
         loopCount += 1;
 
         if (loopCount >= WRONG_PACKET_DURING_INIT_THRESHOLD) {

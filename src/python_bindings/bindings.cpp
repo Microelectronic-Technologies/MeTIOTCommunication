@@ -11,9 +11,6 @@ namespace py = pybind11;
 
 using KeyVector = std::vector<uint8_t>;
 
-// Forward declaration of the C++ function that handles the dynamic cast
-py::object cast_protocol_handler(DeviceClient& client);
-
 // ----------------- For converting python data map <str:protocolValue> to dict
 py::object protocol_value_to_py_object(const ProtocolValue& value) {
      return std::visit([](auto&& arg) -> py::object {
@@ -124,19 +121,10 @@ PYBIND11_MODULE(MeTIOT, m) {
           .def("send_packet", &DeviceClient::send_packet, 
                py::arg("packet"), 
                "Sends a raw data packet (bytes) to the device.")
-
-          // ** FIX 1: Bind the getter needed by the cast_protocol_handler function **
           .def("get_protocol_handler", &DeviceClient::get_protocol_handler, 
                py::return_value_policy::reference_internal,
-               "Internal method to retrieve the raw AbstractProtocol pointer.")
-
+               "Internal method to retrieve the device protocol pointer.") // pointer object casting is automatically handled
           .def("get_device_type", &DeviceClient::get_device_type, "Returns the identified device type.")
-
-          // 2. The CRITICAL Binding Point - This calls the casting function
-          .def("get_specific_protocol_handler", 
-             [](DeviceClient& client) { return cast_protocol_handler(client); },
-             py::return_value_policy::reference_internal,
-             "Returns the protocol handler cast to its specific derived type (e.g., FishTankProtocol).")
           .def("assign_handlers", [](DeviceClient &self, py::function data_cb, 
                                      py::object warn_cb, py::object fatal_cb) {
                auto handler = std::make_shared<PythonEventHandler>(data_cb, warn_cb, fatal_cb);
@@ -149,32 +137,4 @@ PYBIND11_MODULE(MeTIOT, m) {
           .def("get_device_type", &DeviceClient::get_device_type, "Returns the type of the device.")
           .def("get_unique_id", &DeviceClient::get_unique_id, "Returns the 64-bit hardware UID.")   
           ;
-}
-
-// *** Implementation of the Casting Helper Function (No changes needed here) ***
-
-py::object cast_protocol_handler(DeviceClient& client) {
-    AbstractProtocol* base_ptr = client.get_protocol_handler();
-    if (!base_ptr) {
-        throw std::runtime_error("Protocol handler is not initialized.");
-    }
-    
-    DeviceType type = client.get_device_type();
-    
-    // Check the device type and perform the safe dynamic_cast
-    if (type == DeviceType::FISH_TANK) {
-        // dynamic_cast is safe because the C++ logic ensures the underlying object is a FishTankProtocol
-        FishTankProtocol* derived_ptr = dynamic_cast<FishTankProtocol*>(base_ptr);
-        
-        if (derived_ptr == nullptr) {
-            // This case indicates a logic error in the C++ code (e.g., mismatch between deviceType and actual object)
-            throw std::runtime_error("Internal error: Handler type mismatch. Expected FishTankProtocol.");
-        }
-        
-        // py::cast uses the C++ type information to expose the correct Python class
-        return py::cast(derived_ptr, py::return_value_policy::reference_internal);
-    }
-    
-    // Default case: return the base class pointer, only exposing base methods.
-    return py::cast(base_ptr, py::return_value_policy::reference_internal);
 }
