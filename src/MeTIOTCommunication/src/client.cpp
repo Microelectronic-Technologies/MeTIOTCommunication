@@ -143,7 +143,7 @@ void DeviceClient::perform_device_initialization() {
         std::pair<uint8_t, std::vector<uint8_t>> deconstructedIdResponsePacket = deviceAgnosticProtocol.deconstruct_packet(idResponsePacket);
 
         // Ensure it is the correct
-        if (deconstructedIdResponsePacket.first == static_cast<uint8_t>(Protocol::IncomingHeader::General::DeviceIdentifier)) {
+        if (deconstructedIdResponsePacket.first == static_cast<uint8_t>(Protocol::NodeHeader::General::DeviceIdentifier)) {
             // Extract device details
             std::pair<uint8_t, uint64_t> deviceDetails = deviceAgnosticProtocol.extract_device_details(deconstructedIdResponsePacket.second);
             

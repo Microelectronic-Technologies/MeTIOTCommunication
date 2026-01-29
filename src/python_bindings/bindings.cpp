@@ -68,16 +68,16 @@ PYBIND11_MODULE(MeTIOT, m) {
         .value("FISH_TANK", DeviceType::FISH_TANK)
         .export_values(); // access via DeviceType.UNKNOWN
 
-     // Incoming headers
-     py::module_ inc = m.def_submodule("Incoming", "Protocol Headers");
+     // Node headers
+     py::module_ inc = m.def_submodule("NodeHeader", "Protocol Headers");
 
-     py::enum_<Protocol::IncomingHeader::General>(inc, "General")
-          .value("MalformedPacket", Protocol::IncomingHeader::General::MalformedPacketNotification)
+     py::enum_<Protocol::NodeHeader::General>(inc, "General")
+          .value("MalformedPacket", Protocol::NodeHeader::General::MalformedPacketNotification)
           // Exclude DeviceIdentifier as it's not used in python
-          .value("Data", Protocol::IncomingHeader::General::Data)
+          .value("Data", Protocol::NodeHeader::General::Data)
           .export_values();
 
-     py::enum_<Protocol::IncomingHeader::FishTank>(inc, "FishTank")
+     py::enum_<Protocol::NodeHeader::FishTank>(inc, "FishTank")
           .export_values();
 
 

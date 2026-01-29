@@ -1,10 +1,9 @@
-#ifndef PROTOCOL_CONSTANTS_HPP
-#define PROTOCOL_CONSTANTS_HPP
+#pragma once
 
 #include <cstdint>
 
 namespace Protocol {
-    namespace OutgoingHeader {
+    namespace ControllerHeader {
         enum class General : uint8_t {
             MalformedPacketNotification = 0xFF,
             DeviceIdentificationRequest = 0xFE,
@@ -13,9 +12,13 @@ namespace Protocol {
         enum class FishTank : uint8_t {
 
         };
+
+        enum class FilterGuardian : uint8_t {
+        
+        };
     }
 
-    namespace IncomingHeader {
+    namespace NodeHeader {
         enum class General : uint8_t {
             MalformedPacketNotification = 0xFF,
             DeviceIdentifier            = 0xFE,
@@ -25,6 +28,10 @@ namespace Protocol {
         enum class FishTank : uint8_t {
         
         };
+
+        enum class FilterGuardian : uint8_t {
+        
+        };
     }
 
     namespace DataSubHeader {
@@ -32,11 +39,14 @@ namespace Protocol {
             Temperature                 = 0xFF,
             DataEnd                     = 0x00,
         };
+
+        enum class FilterGuardian : uint8_t {
+            
+        };
     }
 
     enum class DeviceIdentifier : uint8_t {
         FishTank                    = 0xFF,
+        FilterGuardian              = 0xFE,
     };
 }
-
-#endif

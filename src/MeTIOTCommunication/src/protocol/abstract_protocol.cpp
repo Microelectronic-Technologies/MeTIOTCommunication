@@ -57,7 +57,7 @@ std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(co
 
 std::vector<uint8_t> AbstractProtocol::create_rejection_packet() {
     std::vector<uint8_t> data = {
-        static_cast<uint8_t>(Protocol::OutgoingHeader::General::MalformedPacketNotification)
+        static_cast<uint8_t>(Protocol::ControllerHeader::General::MalformedPacketNotification)
     };
 
     return construct_packet(data);
