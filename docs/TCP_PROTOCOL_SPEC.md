@@ -58,7 +58,7 @@ All data over the TCP connection adheres to a common structure.
 
 The Data Header (1 byte) is the first piece of information after the CRC and determines the primary function of the packet.
 
-### Standard Library-to-Device Commands
+### Standard Controller-to-Node Commands
 
 These are requests or notifications sent from the client library to the MeT IoT device.
 
@@ -67,7 +67,7 @@ These are requests or notifications sent from the client library to the MeT IoT 
 | Malformed Packet Notification | `0xFF` | (None) | 1 |
 | Device Identification Request | `0xFE` | (None) | 1 |
 
-### Standard Device-to-Library Commands
+### Standard Node-to-Controller Commands
 
 These are responses or unsolicited notifications sent from the MeT IoT device to the client library.
 
@@ -84,6 +84,7 @@ This 1-byte code is carried in the **Device Identifier** packet (`0xFE`).
 | Code (1 Byte) | Device Type |
 |-|-|
 | `0xFF` | Fish Tank |
+| `0xFE` | Filter Guardian |
 | ... | *(Future devices)* |
 
 ## Data Payload Structure (Header 0xFD)
@@ -122,14 +123,14 @@ The Data Payload consists of one or more data points, each preceded by its own S
 
 This section details the custom commands and data formats specific to the Fish Tank device (`Device ID: 0xFF`). The Fish Tank protocol still inherits all commands defined in [Data Header Commands and Flow](#data-header-commands-and-flow).
 
-### Fish Tank: Library-to-Device Commands
+### Fish Tank: Controller-to-Node Commands
 
 | Purpose | Data Header | Data Payload | Bytes |
 |-|-|-|-|
 | Sensor Attribute Request | `0xFC` | None | 1 |
 | Calibration Values | `0xFB` | *To be decided* | |
 
-### Fish Tank: Device-to-Library Commands
+### Fish Tank: Node-to-Controller Commands
 
 | Purpose | Data Header | Data Payload | Bytes |
 |-|-|-|-|
@@ -149,7 +150,6 @@ This section details the custom commands and data formats specific to the Fish T
 | `0xFC` | Oxidation-Reduction Potential | `int16_t` | 
 | `0xFB` | Dissolved Oxygen | `int16_t` |
 | `0xFA` | Conductivity | `int16_t` |
-| `0x00` | Data End | (None/Blank) |
 
 ### Fish Tank: Sensor Attribute Aquisition
 
@@ -180,3 +180,26 @@ I2C Address:Device Type pair can repeat as many times as required.
 #### Calibration Values Command
 
 #### Calibration Finished Command
+
+# Device-Specific Protocol: Filter Guardian
+
+This section details the custom commands and data formats specific to the Filter Guardian device (`Device ID: 0xFE`). The Filter Guardian protocol still inherits all commands defined in [Data Header Commands and Flow](#data-header-commands-and-flow).
+
+### Filter Guardian: Controller-to-Node Commands
+
+| Purpose | Data Header | Data Payload | Bytes |
+|-|-|-|-|
+| ... | ... | ... | ... |
+
+### Filter Guardian: Node-to-Controller Commands
+
+| Purpose | Data Header | Data Payload | Bytes |
+|-|-|-|-|
+| ... | ... | ... | ... |
+
+### Filter Guardian: Data Sub-Header
+
+| Sub-Header | Data Field | Data Type |
+|-|-|-|
+| `0xFF` | Flow Rate *(decimal value)* | `uint16_t` |
+| `0xFE` | Pressure *(decimal value)* | `uint16_t` |

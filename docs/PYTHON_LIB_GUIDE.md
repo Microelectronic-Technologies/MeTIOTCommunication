@@ -51,25 +51,25 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
 > [!NOTE]
 > **Prerequisite:** You must first follow [Connecting to a Device](#connecting-to-a-device) creating a client, connecting, **and** fetching the device protocol.
 
-1. **Define Async Callbacks:** Create function to process incoming data object, warning messages, and fatal errors. You will likely have different data processing function for each device type you expect to handle.
+1. **Define Async Callbacks:** Create a function to process incoming data, warning messages, and fatal errors. You will likely have different data processing function for each device type you expect to handle.
     ```py
     def my_update_handler(device, header, data):
         print(f"Received message from {device.get_unique_id()} with header: {header}")
 
         match header:
-            case MeTIOT.Incoming.General.Data:
+            case MeTIOT.NodeHeader.General.Data:
                 # Use the protocol handler to interpret the raw bytes into a dictionary
                 deviceProtocol = device.get_protocol_handler()
                 telemetry = deviceProtocol.interpret_data(data)
                 print(f"Temperature: {telemetry['Temperature_C']} C")
 
-            case MeTIOT.Incoming.MalformedPacketNotification:
+            case MeTIOT.NodeHeader.MalformedPacketNotification:
                 print("Device reported a communication error.")
                 # Since the library is stateless, you must track your last
                 # sent packet locally if you wish to re-send it (Recommended).
 
             # Example of modular expansion for specific devices
-            # case MeTIOT.Incoming.FishTank.SpecificAlert:
+            # case MeTIOT.NodeHeader.FishTank.SpecificAlert:
             #     print("Fish tank alert!")
 
             case _:
