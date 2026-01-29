@@ -10,8 +10,7 @@ How to use it: There should be no reason to directly touch this file at all. If 
                
 */
 
-#ifndef EVENT_HANDLER_HPP
-#define EVENT_HANDLER_HPP
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -28,5 +27,3 @@ public:
 
     virtual void handle_fatal_error(DeviceClient* client, const std::string& message) = 0;
 };
-
-#endif

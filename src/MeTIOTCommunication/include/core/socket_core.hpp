@@ -1,5 +1,4 @@
-#ifndef SOCKET_CORE_HPP
-#define SOCKET_CORE_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -34,5 +33,3 @@ class SocketCore {
 
     std::vector<uint8_t> recv_data();
 };
-
-#endif

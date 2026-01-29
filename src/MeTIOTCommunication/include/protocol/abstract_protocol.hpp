@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_PROTOCOL_HPP
-#define ABSTRACT_PROTOCOL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -43,5 +42,3 @@ class AbstractProtocol {
 
         virtual ~AbstractProtocol() = 0;
 };
-
-#endif

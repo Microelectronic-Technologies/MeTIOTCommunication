@@ -1,5 +1,4 @@
-#ifndef EXCEPTIONS_HPP
-#define EXCEPTIONS_HPP
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -26,5 +25,3 @@ class EncodingError : public LibraryError {
 class LogicError : public LibraryError {
     using LibraryError::LibraryError;
 };
-
-#endif

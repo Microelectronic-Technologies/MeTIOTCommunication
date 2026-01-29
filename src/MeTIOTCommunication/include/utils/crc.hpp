@@ -1,5 +1,4 @@
-#ifndef CRC_HPP
-#define CRC_HPP
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -25,5 +24,3 @@ uint16_t calculate_crc(const std::vector<uint8_t>& data);
  * @retval   `false` - CRC's DONT match. Data is invalid
  */
 bool check_crc(const uint16_t crc, const std::vector<uint8_t>& data);
-
-#endif

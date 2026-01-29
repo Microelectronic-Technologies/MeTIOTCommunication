@@ -10,8 +10,7 @@ What is the purpose of a "Device Agnostic Protocol"?
 
 */
 
-#ifndef DEVICE_AGNOSTIC_PROTOCOL_HPP
-#define DEVICE_AGNOSTIC_PROTOCOL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -28,5 +27,3 @@ class DeviceAgnosticProtocol : public AbstractProtocol {
 
         std::pair<uint8_t, uint64_t> extract_device_details(const std::vector<uint8_t>& data);
 };
-
-#endif

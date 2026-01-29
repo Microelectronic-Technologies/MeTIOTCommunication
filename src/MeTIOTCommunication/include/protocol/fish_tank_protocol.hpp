@@ -1,5 +1,4 @@
-#ifndef FISH_TANK_PROTOCOL_HPP
-#define FISH_TANK_PROTOCOL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -15,5 +14,3 @@ class FishTankProtocol : public AbstractProtocol {
         
         ~FishTankProtocol() override {}
 };
-
-#endif

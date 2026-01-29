@@ -1,5 +1,4 @@
-#ifndef COBS_HPP
-#define COBS_HPP
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -22,5 +21,3 @@ std::vector<uint8_t> cobs_encode(const std::vector<uint8_t>& data);
  * @retval   Decoded buffer
  */
 std::vector<uint8_t> cobs_decode(const std::vector<uint8_t>& buffer);
-
-#endif

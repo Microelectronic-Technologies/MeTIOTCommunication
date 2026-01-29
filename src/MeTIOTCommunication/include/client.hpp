@@ -1,5 +1,4 @@
-#ifndef CLIENT_HPP
-#define CLIENT_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -92,5 +91,3 @@ class DeviceClient {
      */
     AbstractProtocol* get_protocol_handler() const;
 };
-
-#endif

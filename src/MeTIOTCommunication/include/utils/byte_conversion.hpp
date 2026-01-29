@@ -1,5 +1,4 @@
-#ifndef BYTE_CONVERSION_HPP
-#define BYTE_CONVERSION_HPP
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -25,5 +24,3 @@ uint64_t bytes_to_uint64(const std::vector<uint8_t>& data, int currentPlace);
 float bytes_to_float(const std::vector<uint8_t>& data, int currentPlace);
 
 double bytes_to_double(const std::vector<uint8_t>& data, int currentPlace);
-
-#endif
