@@ -32,16 +32,11 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
                 currentPlace += DATA_SIZE;
                 break;
             }
-            case (Protocol::DataSubHeader::FishTank::DataEnd): {
-                // Data terminator found
-                return organisedData;
-            }
             default: {
                 throw ProtocolError("Protocol: Unknown data sub header occured.");
             }
         }
     }
     
-    // throw ProtocolError("Protocol: No end of data sub header was present in data."); // * No strictly required
     return organisedData;
 }

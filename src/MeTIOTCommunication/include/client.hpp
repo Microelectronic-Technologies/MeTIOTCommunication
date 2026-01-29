@@ -11,6 +11,7 @@
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/device_agnostic_protocol.hpp"
 #include "protocol/fish_tank_protocol.hpp"
+#include "protocol/filter_guardian_protocol.hpp"
 #include "interfaces/event_handler.hpp"
 
 #define FATAL_WARNING_THRESHOLD 10
@@ -19,6 +20,7 @@
 enum class DeviceType {
   UNKNOWN,
   FISH_TANK,
+  FILTER_GUARDIAN,
 };
 
 class DeviceClient {

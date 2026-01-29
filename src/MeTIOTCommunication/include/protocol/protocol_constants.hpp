@@ -36,12 +36,12 @@ namespace Protocol {
 
     namespace DataSubHeader {
         enum class FishTank : uint8_t {
-            Temperature                 = 0xFF,
-            DataEnd                     = 0x00,
+            Temperature                 = 0xFF, // Celcius
         };
 
         enum class FilterGuardian : uint8_t {
-            
+            FlowRate                    = 0xFF, // L/m
+            Pressure                    = 0xFE, // PSI
         };
     }
 

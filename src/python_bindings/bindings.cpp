@@ -66,6 +66,7 @@ PYBIND11_MODULE(MeTIOT, m) {
      py::enum_<DeviceType>(m, "DeviceType")
         .value("UNKNOWN", DeviceType::UNKNOWN)
         .value("FISH_TANK", DeviceType::FISH_TANK)
+        .value("FILTER_GUARDIAN", DeviceType::FILTER_GUARDIAN)
         .export_values(); // access via DeviceType.UNKNOWN
 
      // Node headers
@@ -103,9 +104,14 @@ PYBIND11_MODULE(MeTIOT, m) {
      py::class_<FishTankProtocol, AbstractProtocol>(m, "FishTankProtocol")
           // Constructor
           .def(py::init<>(),
-               "Initializes the protocol handler with a symmetric encryption key.")
+               "Initializes the protocol handler")
           ;
-    
+
+     py::class_<FilterGuardianProtocol, AbstractProtocol>(m, "FilterGuardianProtocol")
+          // Constructor
+          .def(py::init<>(),
+               "Initializes the protocol handler")
+          ;
 
      // --- DeviceClient ---
 

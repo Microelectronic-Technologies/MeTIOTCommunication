@@ -92,6 +92,12 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
 
             return true;
         }
+        case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FilterGuardian)): {
+            deviceType = DeviceType::FILTER_GUARDIAN;
+            protocolHandler = std::make_unique<FilterGuardianProtocol>();
+
+            return true;
+        }
         default: {
             DeviceType::UNKNOWN;
 
