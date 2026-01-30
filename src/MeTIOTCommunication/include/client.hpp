@@ -25,7 +25,7 @@ enum class DeviceType {
 class DeviceClient {
   private:
     SocketCore socketCore;
-    std::unique_ptr<AbstractProtocol> protocolHandler;
+    std::shared_ptr<AbstractProtocol> protocolHandler;
     std::shared_ptr<IEventHandler> callbackHandler;
     DeviceType deviceType;
     uint64_t uniqueDeviceID;
@@ -89,5 +89,5 @@ class DeviceClient {
      *
      * @note    To get access to protocol specific methods (in the child classes) this pointer must be cast to the appropriate child.
      */
-    AbstractProtocol* get_protocol_handler() const;
+    std::shared_ptr<AbstractProtocol> get_protocol_handler() const;
 };

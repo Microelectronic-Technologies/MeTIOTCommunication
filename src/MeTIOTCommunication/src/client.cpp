@@ -88,13 +88,13 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
     switch(deviceID) {
         case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FishTank)): {
             deviceType = DeviceType::FISH_TANK;
-            protocolHandler = std::make_unique<FishTankProtocol>();
+            protocolHandler = std::make_shared<FishTankProtocol>();
 
             return true;
         }
         case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FilterGuardian)): {
             deviceType = DeviceType::FILTER_GUARDIAN;
-            protocolHandler = std::make_unique<FilterGuardianProtocol>();
+            protocolHandler = std::make_shared<FilterGuardianProtocol>();
 
             return true;
         }
@@ -106,9 +106,9 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
     }
 }
 
-AbstractProtocol* DeviceClient::get_protocol_handler() const { 
+std::shared_ptr<AbstractProtocol> DeviceClient::get_protocol_handler() const { 
     if (initialized) {
-        return protocolHandler.get(); 
+        return protocolHandler; 
     }
     throw LogicError("Logic: Device has not been initialized");
 }

@@ -48,7 +48,7 @@ print("Connecting to device...")
 device.connect()
 
 devType = device.get_device_type()
-print(f"Connected! Device type: {devType}")
+print(f"Connected! Device type: {devType}. ID: {device.get_unique_id()}")
 
 if (devType == MeTIOT.DeviceType.FISH_TANK):
     device.assign_handlers(on_data=fishtank_update_handler, on_warning=warning_handler, on_fatal=error_handler)

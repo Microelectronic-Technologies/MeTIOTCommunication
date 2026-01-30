@@ -1,5 +1,17 @@
 # MeT IOT Communication
 
+## Useful Links
+
+* [API Reference](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/API_REFERENCE.md)
+* [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
+* [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
+
+## Changelog `v0.1.3`
+
+```plaintext
+- Fix invalid pointer error on python program exit
+```
+
 ## How To Use
 
 ### Importing the Library
@@ -35,25 +47,30 @@ print("MeTIOT import successful!")
 
 For further information on how to use this library refer to the [PYTHON_LIB_GUIDE.md document](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md).
 
-## How to Compile (Manual. For Testing)
+## How to compile and use from this repository
 
 Linux based systems:
 
-1. Create and navigate into build directory
+1. Clone the repository
+```bash
+git clone https://github.com/Microelectronic-Technologies/MeTIOTCommunication.git
+```
+2. Create and navigate into build directory
 ```bash
 mkdir build
 cd build
 ```
-2. Compile library using CMake
+3. Compile library using CMake
 ```bash
 cmake ..
 cmake --build . --config Release
 ```
-3. Export path to python
+4. Export path to python
 ```bash
 export PYTHONPATH=./src/python_bindings:$PYTHONPATH
 ```
-4. Now you can use the library. If you first want to test it you can try
+5. Now you can use and import the library in your current directory
+6. *(optional)* Test the library is python
 ```bash
 python3
 ```

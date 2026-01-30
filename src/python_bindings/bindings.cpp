@@ -85,7 +85,7 @@ PYBIND11_MODULE(MeTIOT, m) {
      // --- Protocols ---
 
      // Expose the Abstract Base Class
-     py::class_<AbstractProtocol>(m, "AbstractProtocol")
+     py::class_<AbstractProtocol, std::shared_ptr<AbstractProtocol>>(m, "AbstractProtocol")
           // Base class methods
           .def("deconstruct_packet", 
                (std::pair<uint8_t, std::vector<uint8_t>> (AbstractProtocol::*)(const std::vector<uint8_t>&))
@@ -101,13 +101,13 @@ PYBIND11_MODULE(MeTIOT, m) {
           ;
 
      // Expose a Concrete Derived Class (FishTankProtocol)
-     py::class_<FishTankProtocol, AbstractProtocol>(m, "FishTankProtocol")
+     py::class_<FishTankProtocol, AbstractProtocol, std::shared_ptr<FishTankProtocol>>(m, "FishTankProtocol")
           // Constructor
           .def(py::init<>(),
                "Initializes the protocol handler")
           ;
 
-     py::class_<FilterGuardianProtocol, AbstractProtocol>(m, "FilterGuardianProtocol")
+     py::class_<FilterGuardianProtocol, AbstractProtocol, std::shared_ptr<FilterGuardianProtocol>>(m, "FilterGuardianProtocol")
           // Constructor
           .def(py::init<>(),
                "Initializes the protocol handler")
@@ -128,8 +128,7 @@ PYBIND11_MODULE(MeTIOT, m) {
                py::arg("packet"), 
                "Sends a raw data packet (bytes) to the device.")
           .def("get_protocol_handler", &DeviceClient::get_protocol_handler, 
-               py::return_value_policy::reference_internal,
-               "Internal method to retrieve the device protocol pointer.") // pointer object casting is automatically handled
+               "Returns the protocol handler with shared ownership.")
           .def("get_device_type", &DeviceClient::get_device_type, "Returns the identified device type.")
           .def("assign_handlers", [](DeviceClient &self, py::function data_cb, 
                                      py::object warn_cb, py::object fatal_cb) {
