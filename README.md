@@ -55,22 +55,26 @@ Linux based systems:
 ```bash
 git clone https://github.com/Microelectronic-Technologies/MeTIOTCommunication.git
 ```
-2. Create and navigate into build directory
+2. Navigate into repository
+```bash
+cd MeTIOTCommunication/
+```
+3. Create and navigate into build directory
 ```bash
 mkdir build
 cd build
 ```
-3. Compile library using CMake
+4. Compile library using CMake
 ```bash
 cmake ..
 cmake --build . --config Release
 ```
-4. Export path to python
+5. Export path to python
 ```bash
 export PYTHONPATH=./src/python_bindings:$PYTHONPATH
 ```
-5. Now you can use and import the library in your current directory
-6. *(optional)* Test the library is python
+6. Now you can use and import the library in your current directory
+7. *(optional)* Test the library is python
 ```bash
 python3
 ```
@@ -78,6 +82,5 @@ python3
 import MeTIOT
 client = MeTIOT.DeviceClient("0.0.0.0", 12345)
 type(client)
-client.connect()
 ```
 
