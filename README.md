@@ -8,9 +8,13 @@
 
 ## Changelog `v0.1.3`
 
-```plaintext
-- Fix invalid pointer error on python program exit
-```
+- Improved memory deallocation sequence during shutdown to reduce pointer corruption.
+
+## Known issues
+
+- **Exit Signal (SIGABRT/SIGSEGV):** Upon exiting the Python interpreter, a `free(): invalid pointer` error may occur.
+  - **Reason:** This is a known teardown conflict between the Python Garbage Collector and the C++ Runtime (libstdc++). It occurs after all user code has executed.
+  - **Impact:** None. This does not affect data transmission or device logic during the program's lifecycle.
 
 ## How To Use
 

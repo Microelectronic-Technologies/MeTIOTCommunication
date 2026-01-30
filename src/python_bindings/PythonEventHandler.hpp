@@ -14,6 +14,17 @@ public:
                       warn_cb_(std::move(on_warning)),
                       fatal_cb_(std::move(on_fatal)) {}
 
+    void clear_callbacks() {
+        py::gil_scoped_acquire acquire;
+        data_cb_ = py::none();
+        warn_cb_ = py::none();
+        fatal_cb_ = py::none();
+    }
+
+    ~PythonEventHandler() {
+        
+    }
+
     void handle_message(DeviceClient* client, int packet_id, const std::vector<uint8_t>& payload) override {
         py::gil_scoped_acquire acquire;
         try {

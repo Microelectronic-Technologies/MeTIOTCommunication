@@ -39,26 +39,31 @@ std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, co
 PYBIND11_MODULE(MeTIOT, m) {
      m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
 
+     m.add_object("_cleanup", py::capsule([]() {
+          std::cout << "Module cleaning up..." << std::endl;
+     }));
+
      // --- Exceptions ---
-     static py::exception<LibraryError> lib_exc(m, "LibraryError", PyExc_RuntimeError);
-     static py::exception<SocketError> sock_exc(m, "SocketError", lib_exc.ptr());
-     static py::exception<ProtocolError> prot_exc(m, "ProtocolError", lib_exc.ptr());
-     static py::exception<EncodingError> enc_exc(m, "EncodingError", lib_exc.ptr());
-     static py::exception<LogicError> log_exc(m, "LogicError", lib_exc.ptr());
+     auto lib = py::exception<LibraryError>(m, "LibraryError", PyExc_RuntimeError);
+     py::exception<SocketError>(m, "SocketError", lib.ptr());
+     py::exception<ProtocolError>(m, "ProtocolError", lib.ptr());
+     py::exception<EncodingError>(m, "EncodingError", lib.ptr());
+     py::exception<LogicError>(m, "LogicError", lib.ptr());
 
      py::register_exception_translator([](std::exception_ptr p) {
+          if (!p) return;
           try {
-               if (p) std::rethrow_exception(p);
+               std::rethrow_exception(p);
           } catch (const SocketError &e) {
-               py::set_error(sock_exc, e.what());
+               py::set_error(py::module_::import("MeTIOT").attr("SocketError"), e.what());
           } catch (const ProtocolError &e) {
-               py::set_error(prot_exc, e.what());
+               py::set_error(py::module_::import("MeTIOT").attr("ProtocolError"), e.what());
           } catch (const EncodingError &e) {
-               py::set_error(enc_exc, e.what());
+               py::set_error(py::module_::import("MeTIOT").attr("EncodingError"), e.what());
           } catch (const LogicError &e) {
-               py::set_error(log_exc, e.what());
+               py::set_error(py::module_::import("MeTIOT").attr("LogicError"), e.what());
           } catch (const LibraryError &e) {
-               py::set_error(lib_exc, e.what());
+               py::set_error(py::module_::import("MeTIOT").attr("LibraryError"), e.what());
           }
      });
 
