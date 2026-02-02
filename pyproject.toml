@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "MeTIOT"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
     { name="Cody Jackson", email="cjackson@micr.com.au" }
 ]

@@ -8,9 +8,9 @@
 #include "../utils/byte_conversion.hpp"
 #include "../core/exceptions.hpp"
 
-class FishTankProtocol : public AbstractProtocol {
+class TankGuardianProtocol : public AbstractProtocol {
     public:
         std::map<std::string, ProtocolValue> interpret_data(const std::vector<uint8_t>& data) override;
         
-        ~FishTankProtocol() override {}
+        ~TankGuardianProtocol() override {}
 };

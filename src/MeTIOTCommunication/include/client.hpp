@@ -9,7 +9,7 @@
 #include "core/socket_core.hpp"
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/device_agnostic_protocol.hpp"
-#include "protocol/fish_tank_protocol.hpp"
+#include "protocol/tank_guardian_protocol.hpp"
 #include "protocol/filter_guardian_protocol.hpp"
 #include "interfaces/event_handler.hpp"
 
@@ -18,7 +18,7 @@
 
 enum class DeviceType {
   UNKNOWN,
-  FISH_TANK,
+  TANK_GUARDIAN,
   FILTER_GUARDIAN,
 };
 

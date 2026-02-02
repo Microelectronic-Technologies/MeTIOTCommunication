@@ -1,6 +1,6 @@
-#include "../../include/protocol/fish_tank_protocol.hpp"
+#include "../../include/protocol/tank_guardian_protocol.hpp"
 
-std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std::vector<uint8_t>& data) {
+std::map<std::string, ProtocolValue> TankGuardianProtocol::interpret_data(const std::vector<uint8_t>& data) {
     unsigned int currentPlace = 0;
     std::map<std::string, ProtocolValue> organisedData;
     
@@ -13,8 +13,8 @@ std::map<std::string, ProtocolValue> FishTankProtocol::interpret_data(const std:
         uint8_t subheader = data[currentPlace];
         currentPlace += 1; // Move past the subheader
 
-        switch(static_cast<Protocol::DataSubHeader::FishTank>(subheader)) {
-            case (Protocol::DataSubHeader::FishTank::Temperature): {
+        switch(static_cast<Protocol::DataSubHeader::TankGuardian>(subheader)) {
+            case (Protocol::DataSubHeader::TankGuardian::Temperature): {
                 // Verify theres enough space in data vector to contain this
                 const size_t DATA_SIZE = 2; // Byte count of int16_t
                 if (currentPlace + DATA_SIZE > data.size()) {

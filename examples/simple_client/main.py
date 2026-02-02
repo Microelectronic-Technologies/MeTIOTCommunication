@@ -20,12 +20,12 @@ def filterguardian_update_handler(device, header, data):
     print(f"Received message from {device.get_unique_id()} with header: {header}")
 
     match header:
-        case MeTIOT.NodeHeader.General.Data:
+        case MeTIOT.NodeHeader.General.Data.value:
             deviceProtocol = device.get_protocol_handler()
             telemetry = deviceProtocol.interpret_data(data)
             print(f"Flow rate: {telemetry['Flowrate_LM']} L/m")
 
-        case MeTIOT.NodeHeader.MalformedPacketNotification:
+        case MeTIOT.NodeHeader.General.MalformedPacket.value:
             print("Device reported a communication error.")
 
         case _:
@@ -52,8 +52,10 @@ print(f"Connected! Device type: {devType}. ID: {device.get_unique_id()}")
 
 if (devType == MeTIOT.DeviceType.FISH_TANK):
     device.assign_handlers(on_data=fishtank_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    device.start_listening()
 elif (devType == MeTIOT.DeviceType.FILTER_GUARDIAN):
     device.assign_handlers(on_data=filterguardian_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    device.start_listening()
 
 while (True):
     time.sleep(5)

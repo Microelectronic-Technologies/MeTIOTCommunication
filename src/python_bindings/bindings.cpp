@@ -4,7 +4,7 @@
 #include "client.hpp"
 #include "PythonEventHandler.hpp"
 #include "protocol/abstract_protocol.hpp"
-#include "protocol/fish_tank_protocol.hpp"
+#include "protocol/tank_guardian_protocol.hpp"
 #include "protocol/protocol_constants.hpp"
 
 namespace py = pybind11;
@@ -70,7 +70,7 @@ PYBIND11_MODULE(MeTIOT, m) {
      // --- Enums --- 
      py::enum_<DeviceType>(m, "DeviceType")
         .value("UNKNOWN", DeviceType::UNKNOWN)
-        .value("FISH_TANK", DeviceType::FISH_TANK)
+        .value("TANK_GUARDIAN", DeviceType::TANK_GUARDIAN)
         .value("FILTER_GUARDIAN", DeviceType::FILTER_GUARDIAN)
         .export_values(); // access via DeviceType.UNKNOWN
 
@@ -83,7 +83,7 @@ PYBIND11_MODULE(MeTIOT, m) {
           .value("Data", Protocol::NodeHeader::General::Data)
           .export_values();
 
-     py::enum_<Protocol::NodeHeader::FishTank>(inc, "FishTank")
+     py::enum_<Protocol::NodeHeader::TankGuardian>(inc, "TankGuardian")
           .export_values();
 
 
@@ -105,8 +105,8 @@ PYBIND11_MODULE(MeTIOT, m) {
                "Interprets the raw payload data into a director of typed values (str:x)")
           ;
 
-     // Expose a Concrete Derived Class (FishTankProtocol)
-     py::class_<FishTankProtocol, AbstractProtocol, std::shared_ptr<FishTankProtocol>>(m, "FishTankProtocol")
+     // Expose a Concrete Derived Class (TankGuardianProtocol)
+     py::class_<TankGuardianProtocol, AbstractProtocol, std::shared_ptr<TankGuardianProtocol>>(m, "TankGuardianProtocol")
           // Constructor
           .def(py::init<>(),
                "Initializes the protocol handler")

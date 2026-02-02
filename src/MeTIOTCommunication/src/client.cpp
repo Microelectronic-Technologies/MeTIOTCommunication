@@ -86,9 +86,9 @@ uint64_t DeviceClient::get_unique_id() {
 
 bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
     switch(deviceID) {
-        case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FishTank)): {
-            deviceType = DeviceType::FISH_TANK;
-            protocolHandler = std::make_shared<FishTankProtocol>();
+        case (static_cast<uint8_t>(Protocol::DeviceIdentifier::TankGuardian)): {
+            deviceType = DeviceType::TANK_GUARDIAN;
+            protocolHandler = std::make_shared<TankGuardianProtocol>();
 
             return true;
         }

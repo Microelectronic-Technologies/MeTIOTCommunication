@@ -9,7 +9,7 @@ namespace Protocol {
             DeviceIdentificationRequest = 0xFE,
         };
 
-        enum class FishTank : uint8_t {
+        enum class TankGuardian : uint8_t {
 
         };
 
@@ -25,7 +25,7 @@ namespace Protocol {
             Data                        = 0xFD,
         };
 
-        enum class FishTank : uint8_t {
+        enum class TankGuardian : uint8_t {
         
         };
 
@@ -35,7 +35,7 @@ namespace Protocol {
     }
 
     namespace DataSubHeader {
-        enum class FishTank : uint8_t {
+        enum class TankGuardian : uint8_t {
             Temperature                 = 0xFF, // Celcius
         };
 
@@ -46,7 +46,7 @@ namespace Protocol {
     }
 
     enum class DeviceIdentifier : uint8_t {
-        FishTank                    = 0xFF,
+        TankGuardian                = 0xFF,
         FilterGuardian              = 0xFE,
     };
 }

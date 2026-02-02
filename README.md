@@ -6,9 +6,10 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.3`
+## Changelog `v0.1.5`
 
-- Improved memory deallocation sequence during shutdown to reduce pointer corruption.
+- Fixed error in example python code
+- Changed FISH_TANK to TANK_GUARDIAN (among other variants) for better consistency/translation to actual device name
 
 ## Known issues
 
