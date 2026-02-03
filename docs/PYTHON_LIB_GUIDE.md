@@ -26,6 +26,9 @@ MeT IoT devices broadcast their presence using Zeroconf (mDNS). The library incl
 
 Establish a persistent TCP connection and perform the initial device identification handshake.
 
+> [!NOTE]
+> MeT IOT devices do support Zeroconf but that will not be covered in this documentation as its not apart of this library.
+
 1. **Create Client:** Create a client with the device's IP & Port.
     ```py
     import MeTIOT
@@ -57,16 +60,16 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
         print(f"Received message from {device.get_unique_id()} with header: {header}")
 
         match header:
-            case MeTIOT.NodeHeader.General.Data:
+            case MeTIOT.NodeHeader.General.Data.value:
                 # Use the protocol handler to interpret the raw bytes into a dictionary
                 deviceProtocol = device.get_protocol_handler()
                 telemetry = deviceProtocol.interpret_data(data)
                 print(f"Temperature: {telemetry['Temperature_C']} C")
 
-            case MeTIOT.NodeHeader.MalformedPacketNotification:
+            case MeTIOT.NodeHeader.MalformedPacketNotification.value:
                 print("Device reported a communication error.")
-                # Since the library is stateless, you must track your last
-                # sent packet locally if you wish to re-send it (Recommended).
+                # You must track your last sent packet locally
+                # if you wish to re-send it (Recommended).
 
             # Example of modular expansion for specific devices
             # case MeTIOT.NodeHeader.FishTank.SpecificAlert:
@@ -76,17 +79,17 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
                 # Handle other commands defined in the API Reference
                 pass
 
-    def warning_handler(device, msg):
+    def warning_handler(device, code, msg):
         # This function is optional
         #
         # When this function is called the warning handling is already handled by the library. This function is just for debugging.
-        print(f"Device {device.get_unique_id()} has non-fatal warning: {msg}")
+        print(f"Device {device.get_unique_id()} has non-fatal warning (code {code}): {msg}")
 
-    def error_handler(device, msg):
+    def error_handler(device, code, msg):
         # This function is optional
         #
         # When this function is called a fatal error has occured and the listening loop has stopped. The device will no longer listen for messages.
-        print(f"Device {device.get_unique_id()} has fatal error: {msg}")
+        print(f"Device {device.get_unique_id()} has fatal error (code {code}): {msg}")
     ```
 
 2. **Register the Handler/s:** Attach the handler/s to the client instance.
@@ -101,11 +104,12 @@ This library uses a dedicated thread to listen for unsolicited data transfers fr
     #
     # devType = client.get_device_type() # Fetch the current device type
     #
-    # if (devType == MeTIOT.DeviceType.FISH_TANK):
-    #     client.assign_handlers(on_data=fish_tank_update_handler, on_warning=warning_handler, on_fatal=error_handler)
-    # elif (devType == MeTIOT.DeviceType.UNKNOWN):
-    #     print("Unknown device type. Assigning generic handler")
-    #     client.assign_handlers(on_data=generic_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    # if (devType == MeTIOT.DeviceType.TANK_GUARDIAN):
+    #     device.assign_handlers(on_data=fishtank_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    #     device.start_listening()
+    # elif (devType == MeTIOT.DeviceType.FILTER_GUARDIAN):
+    #     device.assign_handlers(on_data=filterguardian_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+    #     device.start_listening()
     ```
     **Behind the Scenes:** The client initiates a background listener thread to monitor the socket. When a message is detected, the library automatically handles the decoding and verification (CRC/COBS). It segregated the payload into its `header` and `data` components and dispatches them directly to your handler.
 
