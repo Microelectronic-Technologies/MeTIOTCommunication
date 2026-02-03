@@ -86,7 +86,7 @@ Registers callback functions for the background listening thread.
 
 Spawns a background thread to monitor the TCP socket. **Requires handlers to be assigned first.**
 
-* **Errors:** `LibraryError` if `assign_handlers` has not been called.
+* **Errors:** `LibraryError` if `assign_handlers` has not been called or if a listening thread is already running.
 
 #### `send_packet(packet: bytes)`
 
@@ -97,10 +97,6 @@ Sends a raw byte buffer to the device.
 * **Arguments:** `packet` (bytes): The encoded payload.
 * **Errors:** `SocketError` on transmission failure.
 
-
-> [!IMPORTANT]
-> **WIP** Document. Below text may not be correct.
-
 ## 2. Protocol Handler Methods (Accessed via `client.get_protocol_handler()`)
 
 The methods available on the protocol handler instance depend entirely on the connected device type. The protocol handler also contains universal utility methods for packet handling.
@@ -109,13 +105,20 @@ The methods available on the protocol handler instance depend entirely on the co
 
 | Method | Returns | Description |
 |-|-|-|
-| `deconstruct_packet(packet: bytes)` | `tuple[int, bytes]` | Decodes the packet buffer, validating CRC, performing COBS unstuffing, and returning the Data Header and raw Data Payload. |
-| `interpret_data(data_payload: bytes)` | `dict` | Interprets the raw Data Payload into a key-value dictionary using known Sub-Headers and Data Types. Keys match the Data Field purpose (e.g., "Temperature_C"). |
+| `deconstruct_packet(packet: bytes)` | `tuple[int, bytes]` | Decodes the packet buffer, validating CRC, performing COBS unstuffing, and returning the Data Header and raw Data Payload. **NOTE:** This function should not be used when the async `on_data` function you declare is called as the data parsed is already decoded. |
+| `interpret_data(data_payload: bytes)` | `dict` | Interprets the raw Data Payload into a key-value dictionary using known Sub-Headers and Data Types. Keys match the Data Field purpose. **NOTE:** Refer to your devices [Protocol Constants](#3-protocol-constants-metiotprotocolconstants) for the key & value pairs. |
 | `fetch_last_packet()` | `bytes` | Returns the raw byte buffer of the last packet successfully created by this protocol handler instance. Useful for re-sending after a `MalformedPacketNotification`. |
 
-### 2.2 Fish Tank Protocol Methods (`Device ID: 0xFF`)
+### 2.2 Tank Guardian Protocol Methods (`Device ID: 0xFF`)
 
-These methods are available if the device type is "Fish Tank"
+These methods are available for devices with the Tank Guardian device type.
+
+| Method | Returns | Purpose | Arguments |
+|-|-|-|-|
+
+### 2.3 Filter Guardian Protocol Methods (`Device ID: 0xFE`)
+
+These methods are available for devices with the Filter Guardian device type.
 
 | Method | Returns | Purpose | Arguments |
 |-|-|-|-|
@@ -124,7 +127,7 @@ These methods are available if the device type is "Fish Tank"
 
 These constants are integers representing the 1-byte Header/Sub-Header codes used in the communication. All constants mentioned here are the exposed constants. In other documentation the codes here are referenced as *Device-to-Library Codes*.
 
-### 3.1 Standard Data Header Codes
+### 3.1 Standard Node Header Codes
 
 | Constant Name | Value | Description |
 |:---|:---|:---|
@@ -132,7 +135,88 @@ These constants are integers representing the 1-byte Header/Sub-Header codes use
 | `DeviceIdentifier` | `0xFE` | Response from the device containing the Device ID and Unique ID. |
 | `DataTransfer` | `0xFD` | Unsolicited data/status update from the device. |
 
-### 3.2 Fish Tank Data Header Codes
+### 3.2 Tank Guardian
+
+#### 3.2.1 Tank Guardian Node Header Codes
 
 | Constant Name | Value | Description |
 |-|-|-|
+
+#### 3.2.2 Tank Guardian Interpreted Data Key & Value Pairs
+
+| Key | Value Type | Value Desc | Note |
+|-|-|-|-|
+| `"Temperature_C"` | Celcius | Temperature sensor temperature | 2 decimal points of percision |
+*See [Universal Protocol Utility Methods](#21-universal-protocol-utility-methods) for more information.*
+
+### 3.3 Filter Guardian
+
+#### 3.3.1 Filter Guardian Node Header Codes
+
+| Constant Name | Value | Description |
+|-|-|-|
+
+#### 3.3.2 Filter Guardian Interpreted Data Key & Value Pairs
+
+| Key | Value Type | Value Desc | Note |
+|-|-|-|-|
+| `"Flowrate_LM"` | Litres per minute | Water flow rate sensor reading | 2 decimal points of precision |
+| `"Pressure_PSI"` | PSI | Air pressure sensor reading | 3 decimal points of precision |
+*See [Universal Protocol Utility Methods](#21-universal-protocol-utility-methods) for more information.*
+
+### 3.4 How To Use These Values?
+
+In your python code you cannot directly compare the function integer parameter with the enum so you must use the value `MeTIOT.ProtocolConstants.Path.To.Constant.value`.
+
+#### 3.4.1 Example
+
+```python
+match header:
+    case MeTIOT.NodeHeader.General.Data.value:
+        deviceProtocol = device.get_protocol_handler()
+        telemetry = deviceProtocol.interpret_data(data)
+        print(f"Flow rate: {telemetry['Flowrate_LM']} L/m")
+
+    case MeTIOT.NodeHeader.General.MalformedPacket.value:
+        print("Device reported a communication error.")
+
+    case _:
+        print(f"Unhandled header occured: {header}")
+```
+
+## 4. Asynchronous Error Codes (`MeTIOT.AsyncErrorCode`)
+
+These constants are intended for use in the asynchronous warning and error handling functions for a device. These constants represent an integer value defined below but best practice dictates directly using the declared enum **not** the value.
+
+### 4.1 Codes
+
+| Type | Name | Path | Value |
+|-|-|-|-|
+| Error Only | Timeout/Socket Innactive | `MeTIOT.AsyncErrorCode.TIMEOUT_OR_INACTIVITY` | 100 |
+| Error Only | Socket Failure | `MeTIOT.AsyncErrorCode.SOCKET_FAILURE` | 101 |
+| Warning & Error | Library Error (Can be either ProtocolError OR EncodingError) | `MeTIOT.AsyncErrorCode.LIBRARY_FATAL` | 200 |
+| Error Only | Unexpected System Error | `MeTIOT.AsyncErrorCode.UNEXPECTED_SYSTEM_ERR` | 999 |
+
+> [!NOTE]
+> To access these values for use in comparisons with integers add `.value` to the end.
+>
+> The value of these codes is **NOT** guarenteed to be accurate. Best practice for using these values is defined below in [4.2 How To Use These Values?](#42-how-to-use-these-values).
+
+### 4.2 How To Use These Values?
+
+In your python code you cannot directly compare the function integer parameter with the enum so you must use the value `MeTIOT.AsyncErrorCode.Path.To.Code.value`.
+
+#### 4.2.1 Example
+
+```python
+def handle_fatal_error(device, error_code: int, message: str):
+    print(f"Device {device.get_unique_id()} has fatal error (code {code}): {msg}")
+
+    if error_code == MeTIOT.AsyncErrorCode.TIMEOUT_OR_INACTIVITY.value:
+        print("Device times out. Triggering integration reload")
+        reconnect_to_device(device)
+
+    elif error_code == MeTIOT.AsyncErrorCode.SOCKET_FAILURE.value:
+        print("Socket connection lost. Reloading...")
+        reconnect_to_device(device)
+```
