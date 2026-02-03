@@ -15,6 +15,8 @@
 
 #define FATAL_WARNING_THRESHOLD 10
 #define WRONG_PACKET_DURING_INIT_THRESHOLD 5
+#define SOCKET_TIMEOUT_MS 5000
+#define SOCKET_DEAD_TIME_MS 60000 // If no message is received in SOCKET_DEAD_TIME_MS than the socket is declared dead
 
 enum class DeviceType {
   UNKNOWN,

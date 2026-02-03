@@ -49,3 +49,22 @@ std::vector<uint8_t> SocketCore::recv_data() {
 
     return buffer;
 }
+
+bool SocketCore::wait_for_data(int timeout_ms) {
+    struct pollfd pfd;
+    pfd.fd = clientSocket;
+    pfd.events = POLLIN;
+
+    int ret = poll(&pfd, 1, timeout_ms);
+
+    if (ret > 0) {
+        if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+            throw SocketError("Socket encountered an error or was closed");
+        }
+        return true; // Data available
+    } else if (ret == 0) {
+        return false; // Timeout
+    }
+
+    throw SocketError("Poll failed.");
+}

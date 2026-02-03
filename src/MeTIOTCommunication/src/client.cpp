@@ -2,25 +2,33 @@
 
 void DeviceClient::listen_loop() {
     uint8_t warningCount = 0;
+    uint8_t timeoutCount = 0;
 
     while (true) {
         try {
-            std::vector<uint8_t> packet = socketCore.recv_data(); // * This throws the fatal errors
+            if (socketCore.wait_for_data(SOCKET_TIMEOUT_MS)) { // Data is available
+                std::vector<uint8_t> packet = socketCore.recv_data(); // * This throws the fatal errors
 
-            std::pair<uint8_t, std::vector<uint8_t>> data = protocolHandler->deconstruct_packet(packet); // * This throws the warning errors
+                std::pair<uint8_t, std::vector<uint8_t>> data = protocolHandler->deconstruct_packet(packet); // * This throws the warning errors
 
-            callbackHandler->handle_message(this, data.first, data.second);
-            warningCount = 0; // Reset warning count after a single successful recv
+                callbackHandler->handle_message(this, data.first, data.second);
+                warningCount = 0; // Reset warning count after a single successful recv
+                timeoutCount = 0; // Reset timeout count
+            } else if (timeoutCount >= (SOCKET_DEAD_TIME_MS / SOCKET_TIMEOUT_MS)) { // Timeout
+                callbackHandler->handle_fatal_error(this, "Socket appears to be dead (no message received in " + std::to_string(SOCKET_DEAD_TIME_MS) + "ms)");
+                break;
+            }
+            timeoutCount++;
         } catch (const SocketError& e) { // Catch specific fatal first
             // Fatal error & kill thread
             callbackHandler->handle_fatal_error(this, e.what());
-            return;
+            break;
         } catch (const LibraryError& e) { // Catch rest of error types (non fatal) including Protocol & Encoding
             warningCount += 1;
 
             if (warningCount >= FATAL_WARNING_THRESHOLD) {
                 callbackHandler->handle_fatal_error(this, e.what());
-                return;
+                break;
             }
 
             // Notify python dev via callback
@@ -34,13 +42,15 @@ void DeviceClient::listen_loop() {
             } catch (const SocketError& e) {
                 // Fatal Error. Stop thread
                 callbackHandler->handle_fatal_error(this, e.what());
-                return;
+                break;
             }
         } catch (const std::exception& e) {
             callbackHandler->handle_fatal_error(this, "Unexpected System Error: " + std::string(e.what()));
-            return;
+            break;
         }
     }
+    initialized = false;
+    return;
 }
 
 void DeviceClient::connect() {

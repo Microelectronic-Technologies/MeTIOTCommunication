@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include "exceptions.hpp"
 
@@ -30,6 +31,8 @@ class SocketCore {
     int disconnect();
 
     int send_data(const std::vector<uint8_t>& data);
+
+    bool wait_for_data(int timeout_ms);
 
     std::vector<uint8_t> recv_data();
 };

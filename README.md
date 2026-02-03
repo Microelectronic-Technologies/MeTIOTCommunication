@@ -8,6 +8,7 @@
 
 ## Changelog `v0.1.5`
 
+- Fixed occurances of the Controller being unable to determine in a timely manner if the socket is dead
 - Fixed error in example python code
 - Changed FISH_TANK to TANK_GUARDIAN (among other variants) for better consistency/translation to actual device name
 
