@@ -32,20 +32,20 @@ public:
         } catch (py::error_already_set &e) { handle_py_error(e); }
     }
 
-    void handle_warning(DeviceClient* client, const std::string& message) override {
+    void handle_warning(DeviceClient* client, int errorCode, const std::string& message) override {
         py::gil_scoped_acquire acquire;
         if (!warn_cb_.is_none()) {
             try {
-                warn_cb_(client, message);
+                warn_cb_(client, errorCode, message);
             } catch (py::error_already_set &e) { handle_py_error(e); }
         }
     }
 
-    void handle_fatal_error(DeviceClient* client, const std::string& message) override {
+    void handle_fatal_error(DeviceClient* client, int errorCode, const std::string& message) override {
         py::gil_scoped_acquire acquire;
         if (!fatal_cb_.is_none()) {
             try {
-                fatal_cb_(client, message);
+                fatal_cb_(client, errorCode, message);
             } catch (py::error_already_set &e) { handle_py_error(e); }
         }
     }

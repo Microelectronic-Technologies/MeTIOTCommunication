@@ -6,6 +6,7 @@
 #include "protocol/abstract_protocol.hpp"
 #include "protocol/tank_guardian_protocol.hpp"
 #include "protocol/protocol_constants.hpp"
+#include "core/exceptions.hpp"
 
 namespace py = pybind11;
 
@@ -84,6 +85,14 @@ PYBIND11_MODULE(MeTIOT, m) {
           .export_values();
 
      py::enum_<Protocol::NodeHeader::TankGuardian>(inc, "TankGuardian")
+          .export_values();
+
+     // Async error codes
+     py::enum_<AsyncErrorCode>(m, "AsyncErrorCode")
+          .value("TIMEOUT_OR_INACTIVITY", AsyncErrorCode::TIMEOUT_OR_INACTIVITY)
+          .value("SOCKET_FAILURE", AsyncErrorCode::SOCKET_ERROR)
+          .value("LIBRARY_FATAL", AsyncErrorCode::LIBRARY_ERROR)
+          .value("UNEXPECTED_SYSTEM_ERR", AsyncErrorCode::UNEXPECTED_SYSTEM_ERR)
           .export_values();
 
 

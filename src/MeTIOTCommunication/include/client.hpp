@@ -32,6 +32,7 @@ class DeviceClient {
     DeviceType deviceType;
     uint64_t uniqueDeviceID;
     bool initialized = false;
+    bool listenThreadActive = false;
 
     /* @brief   TCP Listening thread function
      */

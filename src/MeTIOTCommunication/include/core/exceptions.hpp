@@ -25,3 +25,11 @@ class EncodingError : public LibraryError {
 class LogicError : public LibraryError {
     using LibraryError::LibraryError;
 };
+
+// --- Asynchronous Error & Warning Codes ---
+enum class AsyncErrorCode : int {
+    TIMEOUT_OR_INACTIVITY = 100, // No data recv in correct amount of time
+    SOCKET_ERROR          = 101, // SocketError
+    LIBRARY_ERROR         = 200, // Occurs after warnings threshold passed, LibraryError (EncodingError or ProtocolError)
+    UNEXPECTED_SYSTEM_ERR = 999, // std::exception caught
+};

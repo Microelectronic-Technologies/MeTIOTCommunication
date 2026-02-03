@@ -31,11 +31,11 @@ def filterguardian_update_handler(device, header, data):
         case _:
             print(f"Unhandled header occured: {header}")
 
-def warning_handler(device, msg):
-    print(f"Device {device.get_unique_id()} has non-fatal warning: {msg}")
+def warning_handler(device, code, msg):
+    print(f"Device {device.get_unique_id()} has non-fatal warning (code {code}): {msg}")
 
-def error_handler(device, msg):
-    print(f"Device {device.get_unique_id()} has fatal error: {msg}")
+def error_handler(device, code, msg):
+    print(f"Device {device.get_unique_id()} has fatal error (code {code}): {msg}")
 
 
 deviceIP = "10.0.0.98" # Change this to your device IP

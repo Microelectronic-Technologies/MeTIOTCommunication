@@ -23,7 +23,7 @@ public:
 
     virtual void handle_message(DeviceClient* client, int packet_id, const std::vector<uint8_t>& payload) = 0;
 
-    virtual void handle_warning(DeviceClient* client, const std::string& message) = 0;
+    virtual void handle_warning(DeviceClient* client, int errorCode, const std::string& message) = 0;
 
-    virtual void handle_fatal_error(DeviceClient* client, const std::string& message) = 0;
+    virtual void handle_fatal_error(DeviceClient* client, int errorCode, const std::string& message) = 0;
 };

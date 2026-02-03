@@ -15,24 +15,24 @@ void DeviceClient::listen_loop() {
                 warningCount = 0; // Reset warning count after a single successful recv
                 timeoutCount = 0; // Reset timeout count
             } else if (timeoutCount >= (SOCKET_DEAD_TIME_MS / SOCKET_TIMEOUT_MS)) { // Timeout
-                callbackHandler->handle_fatal_error(this, "Socket appears to be dead (no message received in " + std::to_string(SOCKET_DEAD_TIME_MS) + "ms)");
+                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::TIMEOUT_OR_INACTIVITY), "Socket appears to be dead (no message received in " + std::to_string(SOCKET_DEAD_TIME_MS) + "ms)");
                 break;
             }
             timeoutCount++;
         } catch (const SocketError& e) { // Catch specific fatal first
             // Fatal error & kill thread
-            callbackHandler->handle_fatal_error(this, e.what());
+            callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::SOCKET_ERROR), e.what());
             break;
         } catch (const LibraryError& e) { // Catch rest of error types (non fatal) including Protocol & Encoding
             warningCount += 1;
 
             if (warningCount >= FATAL_WARNING_THRESHOLD) {
-                callbackHandler->handle_fatal_error(this, e.what());
+                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::LIBRARY_ERROR), e.what());
                 break;
             }
 
             // Notify python dev via callback
-            callbackHandler->handle_warning(this, e.what());
+            callbackHandler->handle_warning(this, static_cast<int>(AsyncErrorCode::LIBRARY_ERROR), e.what());
 
             // Send a packet reject to client
             std::vector<uint8_t> packet = protocolHandler->create_rejection_packet();
@@ -41,15 +41,16 @@ void DeviceClient::listen_loop() {
                 send_packet(packet);
             } catch (const SocketError& e) {
                 // Fatal Error. Stop thread
-                callbackHandler->handle_fatal_error(this, e.what());
+                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::SOCKET_ERROR), e.what());
                 break;
             }
         } catch (const std::exception& e) {
-            callbackHandler->handle_fatal_error(this, "Unexpected System Error: " + std::string(e.what()));
+            callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::UNEXPECTED_SYSTEM_ERR), "Unexpected System Error: " + std::string(e.what()));
             break;
         }
     }
     initialized = false;
+    listenThreadActive = false;
     return;
 }
 
@@ -77,6 +78,11 @@ void DeviceClient::start_listening() {
         throw LogicError("Logic: You must first define a callbackHandler");
     }
 
+    if (listenThreadActive) {
+        throw LogicError("Logic: Listen thread already created");
+    }
+
+    listenThreadActive = true;
     std::thread t(&DeviceClient::listen_loop, this);
     t.detach();
 }
