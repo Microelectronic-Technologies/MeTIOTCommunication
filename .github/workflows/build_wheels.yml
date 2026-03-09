@@ -13,27 +13,27 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm]
 
-      steps:
-        - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Set up QEMU
-          if: matrix.os == "ubuntu-latest"
-          uses: docker/setup-qemu-action@v3
+      - name: Set up QEMU
+        if: matrix.os == 'ubuntu-latest'
+        uses: docker/setup-qemu-action@v3
 
-        - name: Build wheels
-          uses: pypa/cibuildwheel@v2.21.3
-          env:
-            CIBW_BEFORE_ALL: >
-              apt-get update && 
-              apt-get install -y software-properties-common && 
-              add-apt-repository -y ppa:ubuntu-toolchain-r/test && 
-              apt-get update && 
-              apt-get install -y gcc-15 g++-15 cmake
-            CIBW_ENVIRONMENT: "CC=gcc-15 CXX=g++-15"
-            CIBW_BUILD: "cp312-* cp313-* cp314-*"
-            CIBW_SKIP: "*-manylinux_i686 *-musllinux_i686"
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          CIBW_BEFORE_ALL: >
+            apt-get update && 
+            apt-get install -y software-properties-common && 
+            add-apt-repository -y ppa:ubuntu-toolchain-r/test && 
+            apt-get update && 
+            apt-get install -y gcc-15 g++-15 cmake
+          CIBW_ENVIRONMENT: "CC=gcc-15 CXX=g++-15"
+          CIBW_BUILD: "cp312-* cp313-* cp314-*"
+          CIBW_SKIP: "*-manylinux_i686 *-musllinux_i686"
 
-        - uses: actions/upload-artifact@v4
-          with:
-            name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-            path: ./wheelhouse/*.whl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
