@@ -27,7 +27,7 @@ jobs:
             dnf install -y gcc-c++ cmake
           CIBW_ENVIRONMENT: "CC=gcc CXX=g++"
           CIBW_BUILD: "cp312-* cp313-* cp314-*"
-          CIBW_PRERELEASE_PYTHONS: True
+          CIBW_ENABLE: "cpython-prerelease"
           CIBW_SKIP: "*-manylinux_i686 *-musllinux_*"
 
       - uses: actions/upload-artifact@v4

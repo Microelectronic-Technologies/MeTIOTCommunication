@@ -6,9 +6,9 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.6`
+## Changelog `v0.1.7`
 
-- Add automated wheel building
+- Add automated builds for newer python builds
 
 ## Known issues
 
