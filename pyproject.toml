@@ -15,7 +15,6 @@ requires-python = ">=3.8"
 [tool.scikit-build]
 cmake.version = ">=3.15"
 sdist.include = ["src/*", "CMakeLists.txt"]
-wheel.expand-build-tag = true
 
 [tool.cibuildwheel]
 manylinux-x86_64-image = "quay.io/pypa/manylinux_2_34_x86_64"
