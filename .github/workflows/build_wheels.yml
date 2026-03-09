@@ -24,8 +24,11 @@ jobs:
         uses: pypa/cibuildwheel@v2.21.3
         env:
           CIBW_BEFORE_ALL: >
-            (command -v dnf && dnf install -y gcc-c++ cmake) || 
-            (command -v apk && apk add --no-network g++ cmake build-base)
+            if command -v dnf; then
+              dnf install -y gcc-c++ cmake;
+            elif command -v apk; then
+              apk add --update g++ cmake build-base;
+            fi
           CIBW_ENVIRONMENT: "CC=gcc CXX=g++"
           CIBW_BUILD: "cp312-* cp313-* cp314-*"
           CIBW_ENABLE: "cpython-prerelease"
