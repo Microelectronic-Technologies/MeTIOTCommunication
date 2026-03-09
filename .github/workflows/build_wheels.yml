@@ -21,7 +21,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        uses: pypa/cibuildwheel@v3.4
         env:
           CIBW_BEFORE_ALL: >
             if command -v dnf; then
