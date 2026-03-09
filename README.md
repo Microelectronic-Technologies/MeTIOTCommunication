@@ -6,7 +6,7 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.7`
+## Changelog `v0.1.7` - `v0.1.8`
 
 - Add automated builds for newer python builds
 
