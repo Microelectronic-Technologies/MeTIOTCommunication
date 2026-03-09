@@ -6,14 +6,9 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.5`
+## Changelog `v0.1.6`
 
-- Added error code communication to asynchronous function handlers
-- Exposed AsyncErrorCode enum
-- Created safeguard to stop users from creating multiple listen threads
-- Fixed occurances of the Controller being unable to determine in a timely manner if the socket is dead
-- Fixed error in example python code
-- Changed FISH_TANK to TANK_GUARDIAN (among other variants) for better consistency/translation to actual device name
+- Add automated wheel building
 
 ## Known issues
 
@@ -30,12 +25,6 @@
 ```sh
 pip install MeTIOT
 ```
-
-> [!NOTE]
-> This library is not pre-compiled.
-> You must have installed on your system (Other version may work but are official unsupported):
-> * GCC >= 15.2.1
-> * CMake >= 3.10
 
 ### Programming with the Library
 
