@@ -18,8 +18,8 @@ sdist.include = ["src/*", "CMakeLists.txt"]
 wheel.expand-build-tag = true
 
 [tool.cibuildwheel]
-manylinux-x86_64-image = "manylinux_2_34"
-manylinux-aarch64-image = "manylinux_2_34"
+manylinux-x86_64-image = "quay.io/pypa/manylinux_2_34_x86_64"
+manylinux-aarch64-image = "quay.io/pypa/manylinux_2_34_aarch64"
 
 [project.urls]
 "Homepage" = "https://github.com/Microelectronic-Technologies/MeTIOTCommunication"
