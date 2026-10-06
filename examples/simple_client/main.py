@@ -1,6 +1,7 @@
 import MeTIOT
 import time
 
+
 def fishtank_update_handler(device, header, data):
     print(f"Received message from {device.get_unique_id()} with header: {header}")
 
@@ -16,6 +17,7 @@ def fishtank_update_handler(device, header, data):
         case _:
             print(f"Unhandled header occured: {header}")
 
+
 def filterguardian_update_handler(device, header, data):
     print(f"Received message from {device.get_unique_id()} with header: {header}")
 
@@ -23,7 +25,9 @@ def filterguardian_update_handler(device, header, data):
         case MeTIOT.NodeHeader.General.Data.value:
             deviceProtocol = device.get_protocol_handler()
             telemetry = deviceProtocol.interpret_data(data)
-            print(f"Flow rate: {telemetry['Flowrate_LM']} L/m")
+            print(
+                f"Flow rate: {telemetry['Flowrate_LM']:.2f} L/m | Pressure Port 1: {telemetry['Pressure_Port1_PSI']:.2f} PSI | Pressure Port 2: {telemetry['Pressure_Port2_PSI']:.2f} PSI | Flood Sensor: {telemetry['Flood_Sensor_Active']}"
+            )
 
         case MeTIOT.NodeHeader.General.MalformedPacket.value:
             print("Device reported a communication error.")
@@ -31,14 +35,18 @@ def filterguardian_update_handler(device, header, data):
         case _:
             print(f"Unhandled header occured: {header}")
 
+
 def warning_handler(device, code, msg):
     print(f"Device {device.get_unique_id()} has non-fatal warning (code {code}): {msg}")
+
 
 def error_handler(device, code, msg):
     print(f"Device {device.get_unique_id()} has fatal error (code {code}): {msg}")
 
 
-deviceIP = "10.0.0.98" # Change this to your device IP or discover it dynamically with mDNS
+deviceIP = (
+    "10.0.0.121"  # Change this to your device IP or discover it dynamically with mDNS
+)
 devicePort = 12345
 
 
@@ -50,12 +58,21 @@ device.connect()
 devType = device.get_device_type()
 print(f"Connected! Device type: {devType}. ID: {device.get_unique_id()}")
 
-if (devType == MeTIOT.DeviceType.TANK_GUARDIAN):
-    device.assign_handlers(on_data=fishtank_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+if devType == MeTIOT.DeviceType.TANK_GUARDIAN:
+    device.assign_handlers(
+        on_data=fishtank_update_handler,
+        on_warning=warning_handler,
+        on_fatal=error_handler,
+    )
     device.start_listening()
-elif (devType == MeTIOT.DeviceType.FILTER_GUARDIAN):
-    device.assign_handlers(on_data=filterguardian_update_handler, on_warning=warning_handler, on_fatal=error_handler)
+elif devType == MeTIOT.DeviceType.FILTER_GUARDIAN:
+    device.assign_handlers(
+        on_data=filterguardian_update_handler,
+        on_warning=warning_handler,
+        on_fatal=error_handler,
+    )
     device.start_listening()
 
-while (True):
+while True:
     time.sleep(5)
+

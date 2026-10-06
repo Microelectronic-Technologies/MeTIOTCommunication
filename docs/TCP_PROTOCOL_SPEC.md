@@ -7,9 +7,9 @@
 
 This protocol governs all TCP communication between MeT IoT devices and external clients (e.g., standalone library, Home Assistant integration).
 
-## Connection Initilization Sequence
+## Connection Initialization Sequence
 
-This sequence desribes the steps a MeT IoT device and the client library take to establish and identify a connection.
+This sequence describes the steps a MeT IoT device and the client library take to establish and identify a connection.
 
 ### Initialization Sequence
 
@@ -39,7 +39,7 @@ All data over the TCP connection adheres to a common structure.
 ### Packet Structure Breakdown
 
 | Field | Bytes | Description |
-|-|-|-|
+| - | - | - |
 | COBS Header | 1 | Marks the start of the packet and contains information for COBS decoding. |
 | CRC | 2 | 16-bit Cyclic Redundancy Check for error detection across the entire data payload. |
 | Data Header | 1 | Identifies the overall purpose or type of the packet (e.g., data transfer, identification). |
@@ -63,7 +63,7 @@ The Data Header (1 byte) is the first piece of information after the CRC and det
 These are requests or notifications sent from the client library to the MeT IoT device.
 
 | Purpose | Data Header | Data Payload | Bytes |
-|-|-|-|-|
+| - | - | - | - |
 | Malformed Packet Notification | `0xFF` | (None) | 1 |
 | Device Identification Request | `0xFE` | (None) | 1 |
 
@@ -72,7 +72,7 @@ These are requests or notifications sent from the client library to the MeT IoT 
 These are responses or unsolicited notifications sent from the MeT IoT device to the client library.
 
 | Purpose | Data Header | Data Payload | Bytes |
-|-|-|-|-|
+| - | - | - | - |
 | Malformed Packet Notification | `0xFF` | (None) | 1 |
 | Device Identifier | `0xFE` | [1 byte Device ID + 8 byte Unique Device ID](#device-identifier-response-packet). | 10 |
 | Data Transfer | `0xFD` | [Variable-length structure.](#data-field-format) | n |
@@ -82,7 +82,7 @@ These are responses or unsolicited notifications sent from the MeT IoT device to
 This 1-byte code is carried in the **Device Identifier** packet (`0xFE`).
 
 | Code (1 Byte) | Device Type |
-|-|-|
+| - | - |
 | `0xFF` | Fish Tank |
 | `0xFE` | Filter Guardian |
 | ... | *(Future devices)* |
@@ -98,7 +98,7 @@ When the **Data Header** is `0xFD` (Data Transfer), the **Data Payload** is stru
 The Data Payload consists of one or more data points, each preceded by its own Sub-Header. This pattern repeats until the payload ends: `Sub-Header`, `Data`, `Sub-Header`, `Data`, ...
 
 | Field | Purpose |
-|-|-|
+| - | - |
 | Data Sub-Header | Identifies the specific data point (e.g., "Current Temp"). |
 | Data | The actual data value, interpreted based on the Sub-Header. |
 
@@ -111,7 +111,7 @@ The Data Payload consists of one or more data points, each preceded by its own S
 > * `int16_t`
 > * `int32_t`
 > * `int64_t`
-> 
+>
 > *All unsigned variants of the above data types are allowed*
 >
 > The following data types *can* be used but research must first be conducted to ensure each devices architecture support the same byte length.
@@ -126,16 +126,16 @@ This section details the custom commands and data formats specific to the Fish T
 ### Fish Tank: Controller-to-Node Commands
 
 | Purpose | Data Header | Data Payload | Bytes |
-|-|-|-|-|
+| - | - | - | - |
 | Sensor Attribute Request | `0xFC` | None | 1 |
 | Calibration Values | `0xFB` | *To be decided* | |
 
 ### Fish Tank: Node-to-Controller Commands
 
 | Purpose | Data Header | Data Payload | Bytes |
-|-|-|-|-|
+| - | - | - | - |
 | Sensor Attribute Response | `0xFC` | *To be decided* | |
-| Calibration Finished | `0xFB` | 1-Byte Sensor Address | 2 | 
+| Calibration Finished | `0xFB` | 1-Byte Sensor Address | 2 |
 
 ### Fish Tank: Data Sub-Header
 
@@ -143,11 +143,11 @@ This section details the custom commands and data formats specific to the Fish T
 > Values marked with *(decimal value)* are multiplied by 100 before transmission then divided by 100 when being interpreted. This only gives an accuracy of up to 2 decimal places.
 
 | Sub-Header | Data Field | Data Type |
-|-|-|-|
+| - | - | - |
 | `0xFF` | Temperature *(decimal value)* | `int16_t` |
 | `0xFE` | Humidity *(decimal value)* | `uint16_t` |
 | `0xFD` | pH *(decimal value)* | `uint16_t` |
-| `0xFC` | Oxidation-Reduction Potential | `int16_t` | 
+| `0xFC` | Oxidation-Reduction Potential | `int16_t` |
 | `0xFB` | Dissolved Oxygen | `int16_t` |
 | `0xFA` | Conductivity | `int16_t` |
 
@@ -167,7 +167,7 @@ I2C Address:Device Type pair can repeat as many times as required.
 > A Fish Tank device can have multiple of the same type of device so its important to sort by their I2C address not.
 
 | Code | Device Type |
-|-|-|
+| - | - |
 | `0xFF` | Temeprature Sensor |
 | `0xFE` | Humidity Sensor |
 | `0xFD` | pH Sensor |
@@ -200,6 +200,8 @@ This section details the custom commands and data formats specific to the Filter
 ### Filter Guardian: Data Sub-Header
 
 | Sub-Header | Data Field | Data Type |
-|-|-|-|
+| - | - | - |
 | `0xFF` | Flow Rate *(decimal value)* | `uint16_t` |
-| `0xFE` | Pressure *(decimal value)* | `uint16_t` |
+| `0xFE` | Pressure Port 1 *(decimal value)* | `uint16_t` |
+| `0xFD` | Pressure Port 2 *(decimal value)* | `uint16_t` |
+| `0xFC` | Flood Sensor *(Active/Inactive)* | `uint16_t` |

@@ -36,7 +36,7 @@ std::map<std::string, ProtocolValue> FilterGuardianProtocol::interpret_data(cons
             currentPlace += DATA_SIZE;
             break;
         }
-        case (Protocol::DataSubHeader::FilterGuardian::Pressure): {
+        case (Protocol::DataSubHeader::FilterGuardian::Pressure_Port1): {
             // Verify theres enough space in data vector to contain this
             const size_t DATA_SIZE = 2; // Byte count of int16_t
             if (currentPlace + DATA_SIZE > data.size()) {
@@ -49,9 +49,44 @@ std::map<std::string, ProtocolValue> FilterGuardianProtocol::interpret_data(cons
 
             float pressurePSI = rawPressure / 1000.0;
 
-            organisedData["Pressure_PSI"] = pressurePSI;
+            organisedData["Pressure_Port1_PSI"] = pressurePSI;
 
             // Move pointer
+            currentPlace += DATA_SIZE;
+            break;
+        }
+        case (Protocol::DataSubHeader::FilterGuardian::Pressure_Port2): {
+            // Verify theres enough space in data vector to contain this
+            const size_t DATA_SIZE = 2; // Byte count of int16_t
+            if (currentPlace + DATA_SIZE > data.size()) {
+                throw ProtocolError("Protocol: Not enough space left in data vector to "
+                                    "read data defined in data sub header.");
+            }
+
+            // Call util to convert 2 byte array to int16_t
+            int16_t rawPressure = bytes_to_int16(data, currentPlace);
+
+            float pressurePSI = rawPressure / 1000.0;
+
+            organisedData["Pressure_Port2_PSI"] = pressurePSI;
+
+            // Move pointer
+            currentPlace += DATA_SIZE;
+            break;
+        }
+        case (Protocol::DataSubHeader::FilterGuardian::FloodSensor): {
+            // Verify theres enough space in data vector to contain this
+            const size_t DATA_SIZE = 1; // Byte count of int16_t
+            if (currentPlace + DATA_SIZE > data.size()) {
+                throw ProtocolError("Protocol: Not enough space left in data vector to "
+                                    "read data defined in data sub header.");
+            }
+
+            // Extract data
+            const bool flood_sensor_value = data[currentPlace];
+
+            organisedData["Flood_Sensor_Active"] = flood_sensor_value;
+
             currentPlace += DATA_SIZE;
             break;
         }

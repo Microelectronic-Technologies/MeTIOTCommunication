@@ -3,50 +3,52 @@
 #include <cstdint>
 
 namespace Protocol {
-    namespace ControllerHeader {
-        enum class General : uint8_t {
-            MalformedPacketNotification = 0xFF,
-            DeviceIdentificationRequest = 0xFE,
-        };
+namespace ControllerHeader {
+enum class General : uint8_t {
+    MalformedPacketNotification = 0xFF,
+    DeviceIdentificationRequest = 0xFE,
+};
 
-        enum class TankGuardian : uint8_t {
+enum class TankGuardian : uint8_t {
 
-        };
+};
 
-        enum class FilterGuardian : uint8_t {
-        
-        };
-    }
+enum class FilterGuardian : uint8_t {
 
-    namespace NodeHeader {
-        enum class General : uint8_t {
-            MalformedPacketNotification = 0xFF,
-            DeviceIdentifier            = 0xFE,
-            Data                        = 0xFD,
-        };
+};
+} // namespace ControllerHeader
 
-        enum class TankGuardian : uint8_t {
-        
-        };
+namespace NodeHeader {
+enum class General : uint8_t {
+    MalformedPacketNotification = 0xFF,
+    DeviceIdentifier = 0xFE,
+    Data = 0xFD,
+};
 
-        enum class FilterGuardian : uint8_t {
-        
-        };
-    }
+enum class TankGuardian : uint8_t {
 
-    namespace DataSubHeader {
-        enum class TankGuardian : uint8_t {
-            Temperature                 = 0xFF, // Celcius
-        };
+};
 
-        enum class FilterGuardian : uint8_t {
-            FlowRate                    = 0xFF, // L/m
-            Pressure                    = 0xFE, // PSI
-        };
-    }
+enum class FilterGuardian : uint8_t {
 
-    enum class DeviceIdentifier : uint8_t {
-        TankGuardian                = 0xFF,
-        FilterGuardian              = 0xFE,
-    };
-}
+};
+} // namespace NodeHeader
+
+namespace DataSubHeader {
+enum class TankGuardian : uint8_t {
+    Temperature = 0xFF, // Celcius
+};
+
+enum class FilterGuardian : uint8_t {
+    FlowRate = 0xFF,       // L/m
+    Pressure_Port1 = 0xFE, // PSI
+    Pressure_Port2 = 0xFD, // PSI
+    FloodSensor = 0xFC,    // On(1)/Off(0)
+};
+} // namespace DataSubHeader
+
+enum class DeviceIdentifier : uint8_t {
+    TankGuardian = 0xFF,
+    FilterGuardian = 0xFE,
+};
+} // namespace Protocol
