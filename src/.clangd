@@ -1,0 +1,35 @@
+CompileFlags:
+  Add:
+    - "-std=c++20"
+    - "-Wall"
+    - "-Wextra"
+    - "-Wno-unused-macros"
+    - "-Iinclude"
+    - "-Isrc"
+  Remove:
+    - "-gno-variable-location-views"
+    - "-fconserve-stack"
+---
+If:
+  PathMatch: .*\.(hpp|h|hh|hxx)$
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+  ClangTidy:
+    Add:
+      - "readability-*"
+      - "bugprone-*"
+      - "performance-*"
+      - "modernize-*"
+    Remove:
+      - "readability-magic-numbers"
+      - "modernize-use-trailing-return-type"
+
+InlayHints:
+  Designators: true
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: true
+  BlockEnd: true
+  TypeNameLimit: 0

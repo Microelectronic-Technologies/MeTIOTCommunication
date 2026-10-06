@@ -1,4 +1,11 @@
-#include "../include/client.hpp"
+#include "client.hpp"
+
+#include "protocol/device_agnostic_protocol.hpp"
+#include "protocol/filter_guardian_protocol.hpp"
+#include "protocol/protocol_constants.hpp"
+#include "protocol/tank_guardian_protocol.hpp"
+
+#include <thread>
 
 void DeviceClient::listen_loop() {
     uint8_t warningCount = 0;
@@ -6,16 +13,19 @@ void DeviceClient::listen_loop() {
 
     while (true) {
         try {
-            if (socketCore.wait_for_data(SOCKET_TIMEOUT_MS)) { // Data is available
+            if (socketCore.wait_for_data(SOCKET_TIMEOUT_MS)) {        // Data is available
                 std::vector<uint8_t> packet = socketCore.recv_data(); // * This throws the fatal errors
 
-                std::pair<uint8_t, std::vector<uint8_t>> data = protocolHandler->deconstruct_packet(packet); // * This throws the warning errors
+                std::pair<uint8_t, std::vector<uint8_t>> data =
+                    protocolHandler->deconstruct_packet(packet); // * This throws the warning errors
 
                 callbackHandler->handle_message(this, data.first, data.second);
                 warningCount = 0; // Reset warning count after a single successful recv
                 timeoutCount = 0; // Reset timeout count
             } else if (timeoutCount >= (SOCKET_DEAD_TIME_MS / SOCKET_TIMEOUT_MS)) { // Timeout
-                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::TIMEOUT_OR_INACTIVITY), "Socket appears to be dead (no message received in " + std::to_string(SOCKET_DEAD_TIME_MS) + "ms)");
+                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::TIMEOUT_OR_INACTIVITY),
+                                                    "Socket appears to be dead (no message received in " +
+                                                        std::to_string(SOCKET_DEAD_TIME_MS) + "ms)");
                 break;
             }
             timeoutCount++;
@@ -45,7 +55,8 @@ void DeviceClient::listen_loop() {
                 break;
             }
         } catch (const std::exception& e) {
-            callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::UNEXPECTED_SYSTEM_ERR), "Unexpected System Error: " + std::string(e.what()));
+            callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::UNEXPECTED_SYSTEM_ERR),
+                                                "Unexpected System Error: " + std::string(e.what()));
             break;
         }
     }
@@ -101,35 +112,35 @@ uint64_t DeviceClient::get_unique_id() {
 }
 
 bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
-    switch(deviceID) {
-        case (static_cast<uint8_t>(Protocol::DeviceIdentifier::TankGuardian)): {
-            deviceType = DeviceType::TANK_GUARDIAN;
-            protocolHandler = std::make_shared<TankGuardianProtocol>();
+    switch (deviceID) {
+    case (static_cast<uint8_t>(Protocol::DeviceIdentifier::TankGuardian)): {
+        deviceType = DeviceType::TANK_GUARDIAN;
+        protocolHandler = std::make_shared<TankGuardianProtocol>();
 
-            return true;
-        }
-        case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FilterGuardian)): {
-            deviceType = DeviceType::FILTER_GUARDIAN;
-            protocolHandler = std::make_shared<FilterGuardianProtocol>();
+        return true;
+    }
+    case (static_cast<uint8_t>(Protocol::DeviceIdentifier::FilterGuardian)): {
+        deviceType = DeviceType::FILTER_GUARDIAN;
+        protocolHandler = std::make_shared<FilterGuardianProtocol>();
 
-            return true;
-        }
-        default: {
-            DeviceType::UNKNOWN;
+        return true;
+    }
+    default: {
+        DeviceType::UNKNOWN;
 
-            return false;
-        }
+        return false;
+    }
     }
 }
 
-std::shared_ptr<AbstractProtocol> DeviceClient::get_protocol_handler() const { 
+std::shared_ptr<AbstractProtocol> DeviceClient::get_protocol_handler() const {
     if (initialized) {
-        return protocolHandler; 
+        return protocolHandler;
     }
     throw LogicError("Logic: Device has not been initialized");
 }
 
-DeviceType DeviceClient::get_device_type() const { 
+DeviceType DeviceClient::get_device_type() const {
     if (initialized) {
         return deviceType;
     }
@@ -143,7 +154,7 @@ void DeviceClient::perform_device_initialization() {
 
     // Create packet
     std::vector<uint8_t> idRequestPacket = deviceAgnosticProtocol.create_device_id_request();
-    
+
     // Send data
     send_packet(idRequestPacket); // * This will throw error if failed to send
 
@@ -162,13 +173,16 @@ void DeviceClient::perform_device_initialization() {
         std::vector<uint8_t> idResponsePacket = socketCore.recv_data(); // * This will throw error if failed to recv
 
         // Decode
-        std::pair<uint8_t, std::vector<uint8_t>> deconstructedIdResponsePacket = deviceAgnosticProtocol.deconstruct_packet(idResponsePacket);
+        std::pair<uint8_t, std::vector<uint8_t>> deconstructedIdResponsePacket =
+            deviceAgnosticProtocol.deconstruct_packet(idResponsePacket);
 
         // Ensure it is the correct
-        if (deconstructedIdResponsePacket.first == static_cast<uint8_t>(Protocol::NodeHeader::General::DeviceIdentifier)) {
+        if (deconstructedIdResponsePacket.first ==
+            static_cast<uint8_t>(Protocol::NodeHeader::General::DeviceIdentifier)) {
             // Extract device details
-            std::pair<uint8_t, uint64_t> deviceDetails = deviceAgnosticProtocol.extract_device_details(deconstructedIdResponsePacket.second);
-            
+            std::pair<uint8_t, uint64_t> deviceDetails =
+                deviceAgnosticProtocol.extract_device_details(deconstructedIdResponsePacket.second);
+
             // Assign specific protocol to protocolHandler
             bool success = assign_device_protocol(deviceDetails.first);
             if (!success) {

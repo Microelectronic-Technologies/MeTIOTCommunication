@@ -1,4 +1,4 @@
-#include "../include/core/socket_core.hpp"
+#include "socket_core.hpp"
 
 SocketCore::SocketCore(const std::string& ip, int port) {
     serverIP = ip;

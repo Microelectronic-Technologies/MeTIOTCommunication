@@ -38,7 +38,7 @@ def error_handler(device, code, msg):
     print(f"Device {device.get_unique_id()} has fatal error (code {code}): {msg}")
 
 
-deviceIP = "10.0.0.98" # Change this to your device IP
+deviceIP = "10.0.0.98" # Change this to your device IP or discover it dynamically with mDNS
 devicePort = 12345
 
 

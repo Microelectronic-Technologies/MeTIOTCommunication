@@ -1,9 +1,13 @@
-#include "../../include/protocol/device_agnostic_protocol.hpp"
+#include "device_agnostic_protocol.hpp"
+
+#include "core/exceptions.hpp"
+#include "protocol/protocol_constants.hpp"
+
+#include <cstring>
 
 std::vector<uint8_t> DeviceAgnosticProtocol::create_device_id_request() {
     std::vector<uint8_t> data = {
-        static_cast<uint8_t>(Protocol::ControllerHeader::General::DeviceIdentificationRequest)
-    };
+        static_cast<uint8_t>(Protocol::ControllerHeader::General::DeviceIdentificationRequest)};
 
     return construct_packet(data);
 }

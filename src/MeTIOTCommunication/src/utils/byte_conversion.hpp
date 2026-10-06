@@ -2,8 +2,6 @@
 
 #include <cstdint>
 #include <vector>
-#include <cstring>
-#include <algorithm>
 
 int8_t bytes_to_int8(const std::vector<uint8_t>& data, int currentPlace);
 

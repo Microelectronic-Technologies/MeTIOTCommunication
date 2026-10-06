@@ -1,4 +1,4 @@
-#include "../../include/utils/crc.hpp"
+#include "crc.hpp"
 
 uint16_t calculate_crc(const std::vector<uint8_t>& data) {
     uint16_t A, crc = 0;
@@ -11,7 +11,7 @@ uint16_t calculate_crc(const std::vector<uint8_t>& data) {
     return crc;
 }
 
-bool check_crc(const uint16_t crc, const std::vector<uint8_t>& data) {
-    uint16_t calculatedCRC = calculate_crc(data);
+bool check_crc(uint16_t crc, const std::vector<uint8_t>& data) {
+    const uint16_t calculatedCRC = calculate_crc(data);
     return calculatedCRC == crc;
 }

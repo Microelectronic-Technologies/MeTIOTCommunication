@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(MeTIOTCommunication LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
@@ -20,6 +22,6 @@ target_compile_features(
 target_include_directories(
     MeTIOTCommunication
     PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )

@@ -1,27 +1,23 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include "core/socket_core.hpp"
+#include "interfaces/event_handler.hpp"
+#include "protocol/abstract_protocol.hpp"
+
 #include <cstdint>
 #include <memory>
-#include <thread>
-
-#include "core/socket_core.hpp"
-#include "protocol/abstract_protocol.hpp"
-#include "protocol/device_agnostic_protocol.hpp"
-#include "protocol/tank_guardian_protocol.hpp"
-#include "protocol/filter_guardian_protocol.hpp"
-#include "interfaces/event_handler.hpp"
+#include <string>
+#include <vector>
 
 #define FATAL_WARNING_THRESHOLD 10
 #define WRONG_PACKET_DURING_INIT_THRESHOLD 5
 #define SOCKET_TIMEOUT_MS 5000
 #define SOCKET_DEAD_TIME_MS 60000 // If no message is received in SOCKET_DEAD_TIME_MS than the socket is declared dead
 
-enum class DeviceType {
-  UNKNOWN,
-  TANK_GUARDIAN,
-  FILTER_GUARDIAN,
+enum class DeviceType : std::uint8_t {
+    UNKNOWN,
+    TANK_GUARDIAN,
+    FILTER_GUARDIAN,
 };
 
 class DeviceClient {
@@ -52,13 +48,14 @@ class DeviceClient {
     bool assign_device_protocol(uint8_t deviceID);
 
   public:
-    DeviceClient(const std::string& ip, int port) : socketCore(ip, port) {}
+    DeviceClient(const std::string& ip, int port)
+        : socketCore(ip, port) {}
 
     /* @brief    Connects socket using IP and Port provided during initialization.
      */
     void connect();
 
-    /* @brief   
+    /* @brief
      */
     void assign_receive_handler(std::shared_ptr<IEventHandler> handler);
 
@@ -73,7 +70,7 @@ class DeviceClient {
     /* @brief    Sends packet over TCP socket.
      *
      * @param    packet   The encoded packet to be sent.
-     * 
+     *
      * @throws   SocketError
      */
     void send_packet(const std::vector<uint8_t>& packet);
@@ -86,11 +83,12 @@ class DeviceClient {
 
     /* @brief   Retrieves device type of the device in this class instance.
      */
-    DeviceType get_device_type() const;
+    [[nodiscard]] DeviceType get_device_type() const;
 
     /* @brief   Retrieves protocolHandler of the device in this class instance.
      *
-     * @note    To get access to protocol specific methods (in the child classes) this pointer must be cast to the appropriate child.
+     * @note    To get access to protocol specific methods (in the child classes) this pointer must be cast to the
+     * appropriate child.
      */
-    std::shared_ptr<AbstractProtocol> get_protocol_handler() const;
+    [[nodiscard]] std::shared_ptr<AbstractProtocol> get_protocol_handler() const;
 };

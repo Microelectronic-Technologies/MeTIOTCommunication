@@ -1,11 +1,17 @@
-#include "../../include/protocol/abstract_protocol.hpp"
+#include "abstract_protocol.hpp"
 
+#include "core/exceptions.hpp"
+#include "protocol_constants.hpp"
+#include "utils/cobs.hpp"
+#include "utils/crc.hpp"
+
+#include <algorithm>
 // Fix for python implementation
 AbstractProtocol::~AbstractProtocol() = default;
 
 std::vector<uint8_t> AbstractProtocol::construct_packet(const std::vector<uint8_t>& data) {
     std::vector<uint8_t> crcDataBuffer;
-    
+
     // -- Calc CRC (little endian)
     uint16_t crc = calculate_crc(data);
     uint8_t highByte = (crc >> 8) & 0xFF;
@@ -13,7 +19,7 @@ std::vector<uint8_t> AbstractProtocol::construct_packet(const std::vector<uint8_
 
     crcDataBuffer.emplace_back(lowByte);
     crcDataBuffer.emplace_back(highByte);
-    
+
     // Copy in data
     crcDataBuffer.insert(crcDataBuffer.end(), data.begin(), data.end());
 
@@ -34,7 +40,8 @@ std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(co
 
     // -- Check CRC (little endian)
     if (headerAndData.size() < CRC_SIZE) {
-        throw ProtocolError("Protocol: Packet size after COBS decoding is not big enough to contain data.");
+        throw ProtocolError("Protocol: Packet size after COBS decoding is not big "
+                            "enough to contain data.");
     }
 
     uint16_t crc = static_cast<uint16_t>(headerAndData[1] << 8) | headerAndData[0];
@@ -57,8 +64,7 @@ std::pair<uint8_t, std::vector<uint8_t>> AbstractProtocol::deconstruct_packet(co
 
 std::vector<uint8_t> AbstractProtocol::create_rejection_packet() {
     std::vector<uint8_t> data = {
-        static_cast<uint8_t>(Protocol::ControllerHeader::General::MalformedPacketNotification)
-    };
+        static_cast<uint8_t>(Protocol::ControllerHeader::General::MalformedPacketNotification)};
 
     return construct_packet(data);
 }
