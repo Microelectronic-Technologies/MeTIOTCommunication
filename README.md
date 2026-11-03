@@ -6,15 +6,16 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.7` - `v0.1.8` - `v0.1.9`
+## Changelog `v0.1.10`
 
-- Add automated builds for newer python builds
+* Add new data type support for filter guardian device
+* Restructure repository
 
 ## Known issues
 
-- **Exit Signal (SIGABRT/SIGSEGV):** Upon exiting the Python interpreter, a `free(): invalid pointer` error may occur.
-  - **Reason:** This is a known teardown conflict between the Python Garbage Collector and the C++ Runtime (libstdc++). It occurs after all user code has executed.
-  - **Impact:** None. This does not affect data transmission or device logic during the program's lifecycle.
+* **Exit Signal (SIGABRT/SIGSEGV):** Upon exiting the Python interpreter, a `free(): invalid pointer` error may occur.
+  * **Reason:** This is a known teardown conflict between the Python Garbage Collector and the C++ Runtime (libstdc++). It occurs after all user code has executed.
+  * **Impact:** None. This does not affect data transmission or device logic during the program's lifecycle.
 
 ## How To Use
 
@@ -50,35 +51,46 @@ For further information on how to use this library refer to the [PYTHON_LIB_GUID
 Linux based systems:
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/Microelectronic-Technologies/MeTIOTCommunication.git
 ```
-2. Navigate into repository
+
+1. Navigate into repository
+
 ```bash
 cd MeTIOTCommunication/
 ```
-3. Create and navigate into build directory
+
+1. Create and navigate into build directory
+
 ```bash
 mkdir build
 cd build
 ```
-4. Compile library using CMake
+
+1. Compile library using CMake
+
 ```bash
 cmake ..
 cmake --build . --config Release
 ```
-5. Export path to python
+
+1. Export path to python
+
 ```bash
 export PYTHONPATH=./src/python_bindings:$PYTHONPATH
 ```
-6. Now you can use and import the library in your current directory
-7. *(optional)* Test the library is python
+
+1. Now you can use and import the library in your current directory
+2. *(optional)* Test the library is python
+
 ```bash
 python3
 ```
+
 ```py
 import MeTIOT
 client = MeTIOT.DeviceClient("0.0.0.0", 12345)
 type(client)
 ```
-
