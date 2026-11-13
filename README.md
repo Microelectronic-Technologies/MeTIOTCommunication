@@ -6,10 +6,11 @@
 * [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 * [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.10`
+## Changelog `v0.1.11`
 
-* Add new data type support for filter guardian device
-* Restructure repository
+* Add support for detecting if filter guardian flood sensor connected
+* Update example to reflect this change
+* Fixed small documentation mistakes
 
 ## Known issues
 

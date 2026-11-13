@@ -4,10 +4,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "MeTIOT"
-version = "0.1.10"
-authors = [
-    { name="Cody Jackson", email="cjackson@micr.com.au" }
-]
+version = "0.1.11"
+authors = [{ name = "Cody Jackson", email = "cjackson@micr.com.au" }]
 description = "Communication handling for all MeT IOT devices"
 readme = "README.md"
 requires-python = ">=3.8"

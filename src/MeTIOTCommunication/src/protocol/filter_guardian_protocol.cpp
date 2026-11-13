@@ -83,9 +83,11 @@ std::map<std::string, ProtocolValue> FilterGuardianProtocol::interpret_data(cons
             }
 
             // Extract data
-            const bool flood_sensor_value = data[currentPlace];
+            const uint8_t raw_flood_sensor_value = data[currentPlace];
 
-            organisedData["Flood_Sensor_Active"] = flood_sensor_value;
+            organisedData["Flood_Sensor_Fitted"] = raw_flood_sensor_value != 0xFF;
+            organisedData["Flood_Sensor_Active"] =
+                raw_flood_sensor_value == 0xFF ? false : static_cast<bool>(raw_flood_sensor_value);
 
             currentPlace += DATA_SIZE;
             break;

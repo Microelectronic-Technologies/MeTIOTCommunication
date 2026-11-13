@@ -204,4 +204,4 @@ This section details the custom commands and data formats specific to the Filter
 | `0xFF` | Flow Rate *(decimal value)* | `uint16_t` |
 | `0xFE` | Pressure Port 1 *(decimal value)* | `uint16_t` |
 | `0xFD` | Pressure Port 2 *(decimal value)* | `uint16_t` |
-| `0xFC` | Flood Sensor *(Active/Inactive)* | `uint16_t` |
+| `0xFC` | Flood Sensor *(0xFF if not fitted, bool otherwise)* | `uint8_t` |

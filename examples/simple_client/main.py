@@ -26,7 +26,7 @@ def filterguardian_update_handler(device, header, data):
             deviceProtocol = device.get_protocol_handler()
             telemetry = deviceProtocol.interpret_data(data)
             print(
-                f"Flow rate: {telemetry['Flowrate_LM']:.2f} L/m | Pressure Port 1: {telemetry['Pressure_Port1_PSI']:.2f} PSI | Pressure Port 2: {telemetry['Pressure_Port2_PSI']:.2f} PSI | Flood Sensor: {telemetry['Flood_Sensor_Active']}"
+                f"Flow rate: {telemetry['Flowrate_LM']:.2f} L/m | Pressure Port 1: {telemetry['Pressure_Port1_PSI']:.2f} PSI | Pressure Port 2: {telemetry['Pressure_Port2_PSI']:.2f} PSI | Flood Sensor: {telemetry['Flood_Sensor_Active']} | Flood Sensor Fitted: {telemetry['Flood_Sensor_Fitted']}"
             )
 
         case MeTIOT.NodeHeader.General.MalformedPacket.value:
@@ -75,4 +75,3 @@ elif devType == MeTIOT.DeviceType.FILTER_GUARDIAN:
 
 while True:
     time.sleep(5)
-
