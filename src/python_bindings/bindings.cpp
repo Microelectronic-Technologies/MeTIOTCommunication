@@ -43,8 +43,6 @@ std::map<std::string, py::object> wrap_interpret_data(AbstractProtocol& self, co
 PYBIND11_MODULE(MeTIOT, m) {
     m.doc() = "Pybind11 bindings for the MeTIOT C++ library.";
 
-    m.add_object("_cleanup", py::capsule([]() { std::cout << "Module cleaning up..." << std::endl; }));
-
     // --- Exceptions ---
     auto lib = py::exception<LibraryError>(m, "LibraryError", PyExc_RuntimeError);
     py::exception<SocketError>(m, "SocketError", lib.ptr());
@@ -128,9 +126,11 @@ PYBIND11_MODULE(MeTIOT, m) {
              "Initializes the device client with IP and port.")
 
         // Standard methods
-        .def("connect", &DeviceClient::connect, "Connects to the remote device.")
-        .def("disconnect", &DeviceClient::disconnect, "Disconnects from the remote device.")
-        .def("send_packet", &DeviceClient::send_packet, py::arg("packet"),
+        .def("connect", &DeviceClient::connect, py::call_guard<py::gil_scoped_release>(),
+             "Connects to the remote device.")
+        .def("disconnect", &DeviceClient::disconnect, py::call_guard<py::gil_scoped_release>(),
+             "Disconnects from the remote device.")
+        .def("send_packet", &DeviceClient::send_packet, py::arg("packet"), py::call_guard<py::gil_scoped_release>(),
              "Sends a raw data packet (bytes) to the device.")
         .def("get_protocol_handler", &DeviceClient::get_protocol_handler,
              "Returns the protocol handler with shared ownership.")
@@ -144,7 +144,7 @@ PYBIND11_MODULE(MeTIOT, m) {
             },
             py::arg("on_data"), py::arg("on_warning") = py::none(), py::arg("on_fatal") = py::none(),
             "Assigns a python function to handle incoming messages.")
-        .def("start_listening", &DeviceClient::start_listening, "Starts the background network thread.")
-        .def("get_device_type", &DeviceClient::get_device_type, "Returns the type of the device.")
+        .def("start_listening", &DeviceClient::start_listening, py::call_guard<py::gil_scoped_release>(),
+             "Starts the background network thread.")
         .def("get_unique_id", &DeviceClient::get_unique_id, "Returns the 64-bit hardware UID.");
 }

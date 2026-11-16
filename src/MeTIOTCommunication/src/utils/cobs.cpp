@@ -2,6 +2,8 @@
 
 #include "core/exceptions.hpp"
 
+#include <algorithm>
+
 std::vector<uint8_t> cobs_encode(const std::vector<uint8_t>& data) {
     if (data.empty()) {
         return {1};
@@ -65,8 +67,13 @@ std::vector<uint8_t> cobs_decode(const std::vector<uint8_t>& buffer) {
             throw EncodingError("COBS: Bad block size detected during decoding.");
         }
 
-        std::copy(buffer.begin() + buffer_index, buffer.begin() + buffer_index + block_size,
-                  std::back_inserter(decoded_data));
+        auto block_begin = buffer.begin() + buffer_index;
+        auto block_end = block_begin + block_size;
+        if (std::find(block_begin, block_end, 0x00) != block_end) {
+            throw EncodingError("COBS: Deliminator occured too early during decoding.");
+        }
+
+        std::copy(block_begin, block_end, std::back_inserter(decoded_data));
 
         buffer_index += block_size;
 

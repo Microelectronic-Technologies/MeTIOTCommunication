@@ -1,17 +1,19 @@
 #include "client.hpp"
 
+#include "core/exceptions.hpp"
 #include "protocol/device_agnostic_protocol.hpp"
 #include "protocol/filter_guardian_protocol.hpp"
 #include "protocol/protocol_constants.hpp"
 #include "protocol/tank_guardian_protocol.hpp"
 
+#include <iostream>
 #include <thread>
 
 void DeviceClient::listen_loop() {
     uint8_t warningCount = 0;
     uint8_t timeoutCount = 0;
 
-    while (true) {
+    while (!stopRequested) {
         try {
             if (socketCore.wait_for_data(SOCKET_TIMEOUT_MS)) {        // Data is available
                 std::vector<uint8_t> packet = socketCore.recv_data(); // * This throws the fatal errors
@@ -30,8 +32,10 @@ void DeviceClient::listen_loop() {
             }
             timeoutCount++;
         } catch (const SocketError& e) { // Catch specific fatal first
-            // Fatal error & kill thread
-            callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::SOCKET_ERROR), e.what());
+                                         // Fatal error & kill thread
+            if (!stopRequested && callbackHandler) {
+                callbackHandler->handle_fatal_error(this, static_cast<int>(AsyncErrorCode::SOCKET_ERROR), e.what());
+            }
             break;
         } catch (const LibraryError& e) { // Catch rest of error types (non fatal) including Protocol & Encoding
             warningCount += 1;
@@ -84,18 +88,25 @@ void DeviceClient::assign_receive_handler(std::shared_ptr<IEventHandler> handler
     callbackHandler = std::move(handler);
 }
 
+DeviceClient::~DeviceClient() {
+    stopRequested = true;
+    socketCore.disconnect(); // Unblocks wait_for_data() / recv_data() immediately
+    if (listenThread.joinable()) {
+        listenThread.join();
+    }
+}
+
 void DeviceClient::start_listening() {
     if (!callbackHandler) {
         throw LogicError("Logic: You must first define a callbackHandler");
     }
 
-    if (listenThreadActive) {
+    if (listenThreadActive.exchange(true)) {
         throw LogicError("Logic: Listen thread already created");
     }
 
-    listenThreadActive = true;
-    std::thread t(&DeviceClient::listen_loop, this);
-    t.detach();
+    stopRequested = false;
+    listenThread = std::jthread(&DeviceClient::listen_loop, this);
 }
 
 void DeviceClient::send_packet(const std::vector<uint8_t>& packet) {
@@ -126,7 +137,7 @@ bool DeviceClient::assign_device_protocol(uint8_t deviceID) {
         return true;
     }
     default: {
-        DeviceType::UNKNOWN;
+        deviceType = DeviceType::UNKNOWN;
 
         return false;
     }

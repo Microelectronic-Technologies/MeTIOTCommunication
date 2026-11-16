@@ -1,38 +1,32 @@
 # MeT IOT Communication
 
+A C++23 communication library with Python bindings for Microelectronic Technologies IoT devices.
+
 ## Useful Links
 
-* [API Reference](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/API_REFERENCE.md)
-* [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
-* [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
+- [API Reference](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/API_REFERENCE.md)
+- [Python Library Guide](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
+- [Example Projects](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/tree/main/examples)
 
-## Changelog `v0.1.11`
+## Changelog `v0.1.12`
 
-* Add support for detecting if filter guardian flood sensor connected
-* Update example to reflect this change
-* Fixed small documentation mistakes
-
-## Known issues
-
-* **Exit Signal (SIGABRT/SIGSEGV):** Upon exiting the Python interpreter, a `free(): invalid pointer` error may occur.
-  * **Reason:** This is a known teardown conflict between the Python Garbage Collector and the C++ Runtime (libstdc++). It occurs after all user code has executed.
-  * **Impact:** None. This does not affect data transmission or device logic during the program's lifecycle.
+- **Resolved Python 3.14 Exit Crash (`SIGABRT` / `free(): invalid pointer`):** Upgraded `pybind11` to `v3.1.0`, removed the invalid module cleanup capsule, and fixed callback teardown in `PythonEventHandler`.
+- **Thread & GIL Safety:** Replaced the detached listener thread with a joinable `std::jthread` in `DeviceClient` and added `gil_scoped_release` guards around blocking socket I/O calls.
+- **Testing & CI:** Added C++ unit/integration tests (`Catch2`), Python extension tests (`pytest`), and a GitHub Actions CI workflow covering C++ builds and Python 3.12–3.14.
 
 ## How To Use
 
-### Importing the Library
+### Installation
 
-#### Use pip to install the library
+Install prebuilt wheels via `pip` (supports Python 3.12+):
 
 ```sh
 pip install MeTIOT
 ```
 
-### Programming with the Library
+### Quick Start
 
-#### Testing the library imported successfully
-
-You can use this code to test you can successfully import the library into your code.
+Verify the library imports and initializes properly:
 
 ```py
 import MeTIOT
@@ -43,55 +37,43 @@ print(type(client))
 print("MeTIOT import successful!")
 ```
 
-#### Using the library
+For full usage instructions, async callbacks, and protocol details, refer to the [Python Library Guide.](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md)
 
-For further information on how to use this library refer to the [PYTHON_LIB_GUIDE.md document](https://github.com/Microelectronic-Technologies/MeTIOTCommunication/blob/main/docs/PYTHON_LIB_GUIDE.md).
+## Building from Source
 
-## How to compile and use from this repository
+### Python Package (Recommended)
 
-Linux based systems:
+1. Clone the repository:
 
-1. Clone the repository
+    ```bash
+    git clone https://github.com/Microelectronic-Technologies/MeTIOTCommunication.git
+    cd MeTIOTCommunication
+    ```
 
-```bash
-git clone https://github.com/Microelectronic-Technologies/MeTIOTCommunication.git
-```
+2. Install in editable or standard mode (requires a C++23 compiler and CMake):
 
-1. Navigate into repository
+    ```bash
+    pip install .
+    ```
 
-```bash
-cd MeTIOTCommunication/
-```
+### C++ Library & Tests Only
 
-1. Create and navigate into build directory
+1. Configure and build with CMake:
 
-```bash
-mkdir build
-cd build
-```
+    ```bash
+    cmake -B build -DBUILD_TESTING=ON -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
+    cmake --build build --parallel
+    ```
 
-1. Compile library using CMake
+2. Run the C++ test suite:
 
-```bash
-cmake ..
-cmake --build . --config Release
-```
+    ```bash
+    ctest --test-dir build --output-on-failure
+    ```
 
-1. Export path to python
-
-```bash
-export PYTHONPATH=./src/python_bindings:$PYTHONPATH
-```
-
-1. Now you can use and import the library in your current directory
-2. *(optional)* Test the library is python
+### Running Python Tests
 
 ```bash
-python3
-```
-
-```py
-import MeTIOT
-client = MeTIOT.DeviceClient("0.0.0.0", 12345)
-type(client)
+pip install ".[test]"
+pytest
 ```

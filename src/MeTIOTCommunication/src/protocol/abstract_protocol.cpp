@@ -6,6 +6,7 @@
 #include "utils/crc.hpp"
 
 #include <algorithm>
+
 // Fix for python implementation
 AbstractProtocol::~AbstractProtocol() = default;
 

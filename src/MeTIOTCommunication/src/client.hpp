@@ -4,9 +4,11 @@
 #include "interfaces/event_handler.hpp"
 #include "protocol/abstract_protocol.hpp"
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #define FATAL_WARNING_THRESHOLD 10
@@ -28,7 +30,9 @@ class DeviceClient {
     DeviceType deviceType;
     uint64_t uniqueDeviceID;
     bool initialized = false;
-    bool listenThreadActive = false;
+    std::atomic<bool> listenThreadActive{false};
+    std::atomic<bool> stopRequested{false};
+    std::jthread listenThread;
 
     /* @brief   TCP Listening thread function
      */
@@ -50,6 +54,8 @@ class DeviceClient {
   public:
     DeviceClient(const std::string& ip, int port)
         : socketCore(ip, port) {}
+
+    ~DeviceClient();
 
     /* @brief    Connects socket using IP and Port provided during initialization.
      */

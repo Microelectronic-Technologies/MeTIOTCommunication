@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  cpp-tests:
+    name: C++ Unit & Integration Tests (Catch2)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure CMake is installed
+        run: |
+          if ! command -v cmake &> /dev/null; then
+            $(command -v sudo) apt-get update && $(command -v sudo) apt-get install -y cmake
+          fi
+
+      - name: Configure CMake with Catch2
+        run: cmake -B build -DBUILD_TESTING=ON -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build C++ targets
+        run: cmake --build build --parallel
+
+      - name: Run CTest
+        run: ctest --test-dir build --output-on-failure
+
+  python-tests:
+    name: Python Extension Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install build & test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install scikit-build-core "pybind11>=3.1.0" cmake ninja pytest
+
+      - name: Build and install MeTIOT
+        run: pip install --no-build-isolation ".[test]"
+
+      - name: Run pytest
+        run: pytest -s

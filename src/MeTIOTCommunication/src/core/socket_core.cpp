@@ -1,5 +1,7 @@
 #include "socket_core.hpp"
 
+#include "exceptions.hpp"
+
 SocketCore::SocketCore(const std::string& ip, int port) {
     serverIP = ip;
     serverPORT = port;
@@ -17,9 +19,7 @@ SocketCore::SocketCore(const std::string& ip, int port) {
     }
 }
 
-SocketCore::~SocketCore() {
-
-}
+SocketCore::~SocketCore() {}
 
 int SocketCore::connect_device() {
     return connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress));

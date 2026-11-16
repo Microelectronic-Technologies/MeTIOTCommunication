@@ -1,17 +1,13 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <cstdint>
-#include <cstring>
-#include <iostream>
 #include <arpa/inet.h>
+#include <cstdint>
 #include <netinet/in.h>
+#include <poll.h>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <poll.h>
-
-#include "exceptions.hpp"
+#include <vector>
 
 #define MAX_RECV_SIZE 1024
 

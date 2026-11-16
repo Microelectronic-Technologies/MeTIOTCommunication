@@ -5,14 +5,24 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include(FetchContent)
-FetchContent_Declare(
-    pybind11
-    GIT_REPOSITORY https://github.com/pybind/pybind11.git
-    GIT_TAG        v3.0.1
-)
-FetchContent_MakeAvailable(pybind11)
+option(BUILD_PYTHON_BINDINGS "Build Python pybind11 module" ON)
+option(BUILD_TESTING "Build C++ unit tests" OFF)
 
 add_subdirectory(src/MeTIOTCommunication)
 
-add_subdirectory(src/python_bindings)
+if(BUILD_PYTHON_BINDINGS)
+    include(FetchContent)
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+        GIT_TAG        v3.1.0
+        FIND_PACKAGE_ARGS CONFIG
+    )
+    FetchContent_MakeAvailable(pybind11)
+    add_subdirectory(src/python_bindings)
+endif()
+
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests/cpp)
+endif()

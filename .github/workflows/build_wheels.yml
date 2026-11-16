@@ -16,23 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        if: matrix.os == 'ubuntu-latest'
-        uses: docker/setup-qemu-action@v3
-
-      - name: Build wheels
+      - name: Build and test wheels
         uses: pypa/cibuildwheel@v3.4
         env:
           CIBW_BEFORE_ALL: >
             if command -v dnf; then
-              dnf install -y gcc-c++ cmake;
+              dnf install -y gcc-c++ cmake git;
             elif command -v apk; then
-              apk add --update g++ cmake build-base;
+              apk add --update g++ cmake git build-base;
             fi
           CIBW_ENVIRONMENT: "CC=gcc CXX=g++"
           CIBW_BUILD: "cp312-* cp313-* cp314-*"
-          CIBW_ENABLE: "cpython-prerelease"
-          CIBW_SKIP: "*-manylinux_i686"
+          CIBW_SKIP: "*-manylinux_i686 *-musllinux*"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -55,7 +50,7 @@ jobs:
           path: dist
           merge-multiple: true
 
-      - name: Publish to PyPi
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
