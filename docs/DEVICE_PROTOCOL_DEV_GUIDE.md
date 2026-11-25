@@ -1,23 +1,35 @@
-# Device Protocol
+# Device Protocol Development Guide
 
-## Current Device Protocol Implementation
+This guide is intended for contributors adding support for new MeT IoT devices.
 
-**Challenge:** Our `DeviceClient` class's `protocolHandler` is of the type `std::unique_ptr<AbstractProtocol>` which stops us from calling device protocol specific functions (e.g., function to create a calibration packet with specific parameters.)
+## Architectural Overview
 
-**Solution:** Ideally the python programmer using this library simply calls the same function to get all of their device specific commands regardless of the device type. The solution to this issue is during the python function call `get_specific_protocol_handler` we automatically resolve exactly what protocol data type we are using (stored in `deviceType` for simplicity) then we dynamically cast the `std::unique_ptr<AbstractProtocol>` type into what ever the device protocol actually is.
+### The Abstraction Challenge
 
-## Creating New Device Protocols
+The `DeviceClient` class utilizes a `std::unique_ptr<AbstractProtocol>` to manage communication. While this provides a clean interface for general data transfer, it creates a type-erasure problem: the base `AbstractProtocol` does not contain methods specific to individual device types (e.g., specialized calibration routines for a Fish Tank).
 
-> [!NOTE]
-> The above information in `Current Device Protocol Implementation` is important to read to understand *why* you are doing the following
+### The Implementation Strategy
 
-When creating a new device protocol (to support device specific protocol commands) following these steps should lead to success:
+To maintain a unified API for Python users, we do not expose the underlying type complexity. Instead, when a device-specific command is requested via Python:
 
-1. Add protocol .hpp file to `include/protocol/` and .cpp file to `src/protocol/`.
-2. Create a class inheriting `AbstractProtocol` (This gives access to required functions like `constructPacket`).
-3. Copy a similar workflow to other reference protocols. Function called -> Create data field -> Call constructPacket() -> return packet.
-4. Add your new device type to `enum class DeviceType` in `include/client.hpp`.
-5. Modify the device identification function in `src/client.cpp` to support your new protocol.
-6. Modify `/src/python_bindings/bindings.cpp` to support your new protocol. You need to add support for protocol specific functions as well as support for dynamically casting the `AbstractProtocol` pointer to your Protocol pointer.
+1. The system identifies the active `DeviceType`.
+2. The C++ backend performs a `dynamic_cast` from `AbstractProtocol` to the specific implementation (e.g., `FishTankProtocol`).
+3. The specific method is executed and the result is returned to the Python layer.
 
-> If you want to add more OUTGOING fields or any protocol related header/subheader names add them to `include/protocol/protocol_constants.hpp`.
+## Workflow: Adding a New Device Protocol
+
+Follow these steps to implement support for a new device type:
+
+1. **File Creation:**
+    - Add a header file (`.hpp`) to `include/protocol/`.
+    - Add an implementation file (`.cpp`) to `src/protocol/`.
+2. **Class Implementation:** Create a new class that inherits from `AbstractProtocol`. Ensure you implement all required virtual functions, such as `constructPacket()`.
+3. **Reference Pattern:** Follow the logic pattern used in existing protocols: `Receive Request` -> `Construct Data Field` -> `Call constructPacket()` -> `Return Packet`.
+4. **Type Registration:** Add your new device type to the `enum class DeviceType` located in `include/client.hpp`.
+5. **Client Integration:** Update the device identification logic in `src/client.cpp` to recognize and instantiate your new protocol class.
+6. **Python Bindings:** Update `/src/python_bindings/bindings.cpp` to:
+    - Expose new device-specific functions to Python.
+    - Implement the `dynamic_cast` logic required to bridge the Python call to your specific protocol class.
+
+> [!TIP]
+> **Constants:** If you need to add more outgoing fields, command headers, or sub-header names, add them to `include/protocol/protocol_constants.hpp`.

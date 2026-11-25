@@ -1,34 +1,31 @@
 # TCP Communication Protocol Specification
 
 > [!NOTE]
-> This documentation details the technical specifications of the protocol used for all TCP communication. **It is not required** to be read or understood for general use of the associated Python library. For usage instructions, please refer to the [How To Use](HowToUse.md) documentation.
+> This documentation details the technical specifications of the protocol used for all TCP communication. **It is not required** to be read or understood for general use of the associated Python library. For usage instructions, please refer to the [Python Library Guide](PYTHON_LIB_GUIDE.md).
 
 ## Protocol Scope and Usage
 
-This protocol governs all TCP communication between MeT IoT devices and external clients (e.g., standalone library, Home Assistant integration).
+This protocol governs all TCP communication between supported MeT IoT devices, and external clients (e.g., this standalone library, Home Assistant integration).
 
 ## Connection Initialization Sequence
 
-This sequence describes the steps a MeT IoT device and the client library take to establish and identify a connection.
-
 ### Initialization Sequence
+
+MeT device network discovery and initialization follows this pattern:
 
 1. **Discovery:** The device broadcasts a Zeroconf (mDNS) packet for initial discovery.
 2. **Connection:** The client library connects to the device's TCP socket.
 3. **Request:** The client library sends a **Device Identification Request** command.
-4. **Response:** The device responds with a **Device Identifier** response packet.
+4. **Response:** The device responds with a **Device Identifier Response** packet.
 5. **Operation:** Regular data exchange begins.
 
-### Device Identifier Response Packet
+### Device Identifier Packets
 
-This specific packet is sent by the IoT device to the library during connection initialization.
+The initial *Device Identification Request* packet follows the general structure outlined in [Packet Structure Breakdown](#packet-structure-breakdown), utilizing the Data Header field to contain the [identification request header](#standard-controller-to-node-commands) with an empty data section.
+
+The structure of the *Device Identification Response* packet still follows the [outlined packet structure](#packet-structure-breakdown), utilizing the data section for a 1-byte device type, followed by an 8-byte unique device identifier.
 
 ![Device Identifier Response](images/DeviceIdentifierResponse.jpg)
-
-The Data Payload (within a Data Header `0xFE` packet) contains the following information:
-
-* **8-Bit Device ID:** Specifies the type of device (e.g., Fish Tank).
-* **64-Bit Unique Device ID:** A unique identifier for the specific device instance.
 
 ## General Packet Format
 
@@ -54,7 +51,7 @@ All data over the TCP connection adheres to a common structure.
 ## Data Header Commands and Flow
 
 > [!NOTE]
-> All relevant **Bytes** columns in tables **do not include protocol overhead** and only include the length of the header + data. The protocol overhead specifically refers to COBS trailer, COBS deliminator, and 16-Bit CRC which make up for a total of **4 bytes not included in those values**.
+> All relevant **Bytes** columns in tables **do not include protocol overhead** and only include the length of the header + data. The protocol overhead specifically refers to COBS trailer, COBS deliminator, and 16-Bit CRC which account for a total of **4 bytes not included in those values**.
 
 The Data Header (1 byte) is the first piece of information after the CRC and determines the primary function of the packet.
 
@@ -85,7 +82,7 @@ This 1-byte code is carried in the **Device Identifier** packet (`0xFE`).
 | - | - |
 | `0xFF` | Fish Tank |
 | `0xFE` | Filter Guardian |
-| ... | *(Future devices)* |
+| ... | *(Future device's)* |
 
 ## Data Payload Structure (Header 0xFD)
 
@@ -114,7 +111,7 @@ The Data Payload consists of one or more data points, each preceded by its own S
 >
 > *All unsigned variants of the above data types are allowed*
 >
-> The following data types *can* be used but research must first be conducted to ensure each devices architecture support the same byte length.
+> The following data types *can* be used but research must first be conducted to ensure each device's architecture supports the same byte length.
 >
 > * `float`
 > * `double`
@@ -137,49 +134,44 @@ This section details the custom commands and data formats specific to the Fish T
 | Sensor Attribute Response | `0xFC` | *To be decided* | |
 | Calibration Finished | `0xFB` | 1-Byte Sensor Address | 2 |
 
-### Fish Tank: Data Sub-Header
+### Fish Tank: Data Sub-Header Types
+
+This section describes how sensor types and individual sensor instances are identified within the `Sensor Attribute Response` packet.
+
+#### Identifier Byte
+
+The Identifier Byte is a single byte split into two 4-bit nibbles:
+
+| Bits | Purpose | Description |
+|-|-|-|
+| 7-4 (High Nibble) | Sensor Type | Defines the category of sensor (see table below). |
+| 3-0 (Low Nibble) | Sensor Index | A unique ID (0-15) assigned to each physical sensor of the same type on this device. |
+
+#### Sensor Types
 
 > [!NOTE]
-> Values marked with *(decimal value)* are multiplied by 100 before transmission then divided by 100 when being interpreted. This only gives an accuracy of up to 2 decimal places.
+> Values marked with (decimal value) are transmitted as integers multiplied by 100 (e.g., 25.50 is sent as `2550`) and must be divided by 100 upon interpretation.
 
-| Sub-Header | Data Field | Data Type |
+| Sensor Type (Nibble) | Data Field | Data Type | 
 | - | - | - |
-| `0xFF` | Temperature *(decimal value)* | `int16_t` |
-| `0xFE` | Humidity *(decimal value)* | `uint16_t` |
-| `0xFD` | pH *(decimal value)* | `uint16_t` |
-| `0xFC` | Oxidation-Reduction Potential | `int16_t` |
-| `0xFB` | Dissolved Oxygen | `int16_t` |
-| `0xFA` | Conductivity | `int16_t` |
-
-### Fish Tank: Sensor Attribute Aquisition
-
-During the devices startup it allocates a unique I2C address and stores the device type for all devices on the I2C bus. For later use (like calibration) we will need to store this information so we know what types of devices are currently associated with the device.
-
-#### Sensor Attribute Response Command
-
-I2C Address:Device Type pair can repeat as many times as required.
-
-![Fish Tank Sensor Attribute Response](images/FishTankSensorAttributeResponse.jpg)
-
-#### Sensor Device Types
-
-> [!NOTE]
-> A Fish Tank device can have multiple of the same type of device so its important to sort by their I2C address not.
-
-| Code | Device Type |
-| - | - |
-| `0xFF` | Temeprature Sensor |
-| `0xFE` | Humidity Sensor |
-| `0xFD` | pH Sensor |
-| `0xFC` | Oxidation-Reduction Potential Sensor |
-| `0xFB` | Dissolved Oxygen Sensor |
-| `0xFA` | Conductivity Sensor |
+| `0xF` | Temperature *(decimal value)* | `int16_t` |
+| `0xE` | Humidity *(decimal value)* | `uint16_t` |
+| `0xD` | pH *(decimal value)* | `uint16_t` |
+| `0xC` | Oxidation-Reduction Potential | `int16_t` |
+| `0xB` | Dissolved Oxygen | `int16_t` |
+| `0xA` | Conductivity | `int16_t` |
 
 ### Fish Tank: Calibration
 
 #### Calibration Values Command
 
+> [!WARNING]
+> This device does not yet support calibration over TCP
+
 #### Calibration Finished Command
+
+> [!WARNING]
+> This device does not yet support calibration over TCP
 
 # Device-Specific Protocol: Filter Guardian
 
